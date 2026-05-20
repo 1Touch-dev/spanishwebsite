@@ -49,7 +49,7 @@ export async function getArticlesAsNewsItems(): Promise<NewsItem[]> {
     id: `internal-${a.slug}`,
     title: a.title,
     excerpt: a.excerpt,
-    url: `/noticias/${a.slug}`,
+    url: `/news/${a.slug}`,
     image: a.image,
     source: 'FútHoy',
     pubDate: new Date(a.date).toISOString(),

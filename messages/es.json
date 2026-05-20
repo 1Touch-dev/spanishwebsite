@@ -1,18 +1,19 @@
 {
   "site": {
     "name": "FútHoy",
-    "tagline": "Toda la actualidad del fútbol español",
-    "description": "Las últimas noticias de La Liga, Champions League, fichajes y la selección española."
+    "tagline": "Toda la actualidad del fútbol del mundo hispano",
+    "description": "Noticias y análisis del fútbol de México, Colombia, Argentina, España, Perú y la Copa del Mundo."
   },
   "nav": {
-    "laliga": "La Liga",
-    "champions": "Champions",
-    "mundial": "Mundial",
-    "transfers": "Transfers",
-    "realMadrid": "Real Madrid",
-    "barca": "Barça",
-    "resultados": "Resultados",
-    "analisis": "Análisis",
+    "news": "Noticias",
+    "worldCup": "Copa del Mundo",
+    "mexico": "México",
+    "colombia": "Colombia",
+    "argentina": "Argentina",
+    "spain": "España",
+    "peru": "Perú",
+    "matches": "Resultados",
+    "standings": "Clasificación",
     "search": "Buscar"
   },
   "ticker": {
@@ -23,7 +24,9 @@
     "latestNews": "ÚLTIMAS NOTICIAS",
     "highlightsOfDay": "HIGHLIGHTS DEL DÍA",
     "seeAll": "Ver todo",
-    "seeMore": "Ver más"
+    "seeMore": "Ver más",
+    "heroLead": "Lo más destacado",
+    "trending": "Tendencias"
   },
   "sidebar": {
     "liveScores": "Resultados en vivo",
@@ -50,6 +53,38 @@
     "share": "Compartir",
     "relatedNews": "Noticias relacionadas",
     "readSource": "Leer en"
+  },
+  "filters": {
+    "all": "Todas",
+    "laliga": "La Liga",
+    "champions": "Champions",
+    "worldCup": "Copa del Mundo",
+    "transfers": "Fichajes",
+    "national": "Selecciones",
+    "analysis": "Análisis"
+  },
+  "country": {
+    "newsTitle": "Noticias de {country}",
+    "matchesTitle": "Partidos",
+    "standingsTitle": "Tabla",
+    "topPlayers": "Jugadores destacados"
+  },
+  "states": {
+    "loading": "Cargando noticias…",
+    "emptyTitle": "Sin resultados",
+    "emptyMessage": "Aún no hay noticias para esta sección.",
+    "errorTitle": "No pudimos cargar las noticias",
+    "errorMessage": "Algo falló en la conexión. Inténtalo de nuevo en unos segundos.",
+    "retry": "Reintentar"
+  },
+  "search": {
+    "title": "Buscar",
+    "subtitle": "Encuentra noticias en FútHoy y fuentes agregadas.",
+    "placeholder": "Buscar equipos, jugadores, ligas…",
+    "hint": "Escribe un equipo, jugador o tema para buscar en todas las noticias.",
+    "noResultsTitle": "Sin coincidencias",
+    "noResultsMessage": "No hay noticias para \"{query}\". Prueba con otro término.",
+    "resultsCount": "{count, plural, one {# resultado} other {# resultados}}"
   },
   "footer": {
     "about": "Sobre nosotros",

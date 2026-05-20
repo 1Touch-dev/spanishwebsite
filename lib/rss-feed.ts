@@ -20,7 +20,7 @@ function toRfc822(date: string): string {
 }
 
 function articleItemXml(article: Article, siteUrl: string): string {
-  const link = `${siteUrl}/noticias/${article.slug}`;
+  const link = `${siteUrl}/news/${article.slug}`;
   const description = escapeXml(article.excerpt || article.title);
   const title = escapeXml(article.title);
   const author = escapeXml(article.author);

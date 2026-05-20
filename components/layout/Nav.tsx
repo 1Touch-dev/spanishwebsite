@@ -4,15 +4,14 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
-const NAV_LINKS = [
-  { key: 'laliga', href: '/la-liga' },
-  { key: 'champions', href: '/champions' },
-  { key: 'mundial', href: '/mundial' },
-  { key: 'transfers', href: '/transfers' },
-  { key: 'realMadrid', href: '/equipos/real-madrid' },
-  { key: 'barca', href: '/equipos/barcelona' },
-  { key: 'resultados', href: '/resultados' },
-  { key: 'analisis', href: '/analisis' },
+export const NAV_LINKS = [
+  { key: 'news', href: '/news', flag: null },
+  { key: 'worldCup', href: '/world-cup', flag: null },
+  { key: 'mexico', href: '/country/mexico', flag: '🇲🇽' },
+  { key: 'colombia', href: '/country/colombia', flag: '🇨🇴' },
+  { key: 'argentina', href: '/country/argentina', flag: '🇦🇷' },
+  { key: 'spain', href: '/country/spain', flag: '🇪🇸' },
+  { key: 'peru', href: '/country/peru', flag: '🇵🇪' },
 ] as const;
 
 export function Nav() {
@@ -24,16 +23,17 @@ export function Nav() {
       <div className="container-fh">
         <ul className="flex items-center gap-1 text-sm font-semibold text-white/90">
           {NAV_LINKS.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
               <li key={link.key}>
                 <Link
                   href={link.href}
                   className={cn(
-                    'inline-flex items-center px-4 py-3 transition-colors hover:bg-brand-red-dark hover:text-white',
-                    isActive && 'bg-brand-red-dark text-white shadow-inner'
+                    'inline-flex items-center gap-1.5 px-4 py-3 transition-colors hover:bg-brand-red-dark hover:text-white',
+                    isActive && 'bg-brand-red-dark text-white shadow-inner',
                   )}
                 >
+                  {link.flag ? <span aria-hidden>{link.flag}</span> : null}
                   {t(link.key)}
                 </Link>
               </li>
@@ -44,5 +44,3 @@ export function Nav() {
     </nav>
   );
 }
-
-export { NAV_LINKS };

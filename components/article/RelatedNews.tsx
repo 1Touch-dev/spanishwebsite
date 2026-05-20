@@ -18,7 +18,7 @@ export function RelatedNews({ articles }: RelatedNewsProps) {
         {articles.map((article) => (
           <Link
             key={article.slug}
-            href={`/noticias/${article.slug}`}
+            href={`/news/${article.slug}`}
             className="group flex gap-4 rounded-lg bg-white p-4 shadow-card transition-all hover:shadow-card-hover hover:-translate-y-0.5"
           >
             {article.image && (

@@ -45,8 +45,9 @@ export function MobileNav() {
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-white/5 px-4 py-3 text-sm font-semibold hover:bg-white/5"
+                    className="flex items-center gap-2 border-b border-white/5 px-4 py-3 text-sm font-semibold hover:bg-white/5"
                   >
+                    {link.flag ? <span aria-hidden>{link.flag}</span> : null}
                     {t(link.key)}
                   </Link>
                 </li>

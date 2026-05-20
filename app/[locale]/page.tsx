@@ -1,30 +1,13 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ArrowRight } from 'lucide-react';
-import { HeroCard } from '@/components/home/HeroCard';
-import { SideStoryCard } from '@/components/home/SideStoryCard';
-import { NewsCard } from '@/components/home/NewsCard';
+import { HomeNewsClient } from '@/components/home/HomeNewsClient';
 import { HighlightVideoCard } from '@/components/home/HighlightVideoCard';
 import { LiveScoresWidget } from '@/components/sidebar/LiveScoresWidget';
 import { StandingsTable } from '@/components/sidebar/StandingsTable';
 import { TopScorersWidget } from '@/components/sidebar/TopScorersWidget';
-import { getAggregatedNews } from '@/lib/rss';
-import { getArticlesAsNewsItems } from '@/lib/mdx';
-import type { NewsItem } from '@/lib/types';
 
 export const revalidate = 300;
-
-async function getHomepageNews(): Promise<NewsItem[]> {
-  const [rss, mdx] = await Promise.all([getAggregatedNews(), getArticlesAsNewsItems()]);
-  const merged = [...mdx, ...rss];
-  merged.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-  const seen = new Set<string>();
-  return merged.filter((n) => {
-    if (seen.has(n.id)) return false;
-    seen.add(n.id);
-    return true;
-  });
-}
 
 const HIGHLIGHTS = [
   {
@@ -52,43 +35,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   setRequestLocale(locale);
 
   const t = await getTranslations('home');
-  const news = await getHomepageNews();
-
-  const hero = news.find((n) => n.exclusive) ?? news[0];
-  const sideStories = news.filter((n) => n.id !== hero?.id).slice(0, 2);
-  const latestNews = news.filter((n) => n.id !== hero?.id && !sideStories.some((s) => s.id === n.id)).slice(0, 8);
 
   return (
     <div className="container-fh py-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="lg:col-span-2 space-y-6">
-          {hero && <HeroCard item={hero} />}
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {sideStories.map((item) => (
-              <SideStoryCard key={item.id} item={item} />
-            ))}
-          </div>
-
-          <div>
-            <div className="mb-3 flex items-end justify-between border-b border-brand-border pb-2">
-              <h2 className="font-display text-xl font-extrabold uppercase tracking-tight text-brand-navy">
-                {t('latestNews')}
-              </h2>
-              <Link
-                href="/noticias"
-                className="inline-flex items-center gap-1 text-sm font-bold text-brand-red hover:underline"
-              >
-                {t('seeAll')}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {latestNews.map((item) => (
-                <NewsCard key={item.id} item={item} />
-              ))}
-            </div>
-          </div>
+          <HomeNewsClient />
 
           <div>
             <div className="mb-3 flex items-end justify-between border-b border-brand-border pb-2">
@@ -96,7 +48,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 {t('highlightsOfDay')}
               </h2>
               <Link
-                href="/videos"
+                href="/news"
                 className="inline-flex items-center gap-1 text-sm font-bold text-brand-red hover:underline"
               >
                 {t('seeMore')}

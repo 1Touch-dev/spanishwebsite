@@ -1,18 +1,19 @@
 {
   "site": {
     "name": "FútHoy",
-    "tagline": "All the latest Spanish football news",
-    "description": "Latest news from La Liga, Champions League, transfers and the Spain national team."
+    "tagline": "Football news across the Spanish-speaking world",
+    "description": "News and analysis from Mexico, Colombia, Argentina, Spain, Peru and the FIFA World Cup."
   },
   "nav": {
-    "laliga": "La Liga",
-    "champions": "Champions",
-    "mundial": "World Cup",
-    "transfers": "Transfers",
-    "realMadrid": "Real Madrid",
-    "barca": "Barça",
-    "resultados": "Scores",
-    "analisis": "Analysis",
+    "news": "News",
+    "worldCup": "World Cup",
+    "mexico": "Mexico",
+    "colombia": "Colombia",
+    "argentina": "Argentina",
+    "spain": "Spain",
+    "peru": "Peru",
+    "matches": "Matches",
+    "standings": "Standings",
     "search": "Search"
   },
   "ticker": {
@@ -23,7 +24,9 @@
     "latestNews": "LATEST NEWS",
     "highlightsOfDay": "HIGHLIGHTS OF THE DAY",
     "seeAll": "See all",
-    "seeMore": "See more"
+    "seeMore": "See more",
+    "heroLead": "Top stories",
+    "trending": "Trending"
   },
   "sidebar": {
     "liveScores": "Live Scores",
@@ -50,6 +53,38 @@
     "share": "Share",
     "relatedNews": "Related news",
     "readSource": "Read on"
+  },
+  "filters": {
+    "all": "All",
+    "laliga": "La Liga",
+    "champions": "Champions",
+    "worldCup": "World Cup",
+    "transfers": "Transfers",
+    "national": "National Teams",
+    "analysis": "Analysis"
+  },
+  "country": {
+    "newsTitle": "{country} news",
+    "matchesTitle": "Matches",
+    "standingsTitle": "Standings",
+    "topPlayers": "Featured players"
+  },
+  "states": {
+    "loading": "Loading news…",
+    "emptyTitle": "No results",
+    "emptyMessage": "No news yet for this section.",
+    "errorTitle": "Couldn't load news",
+    "errorMessage": "Something failed. Please try again in a moment.",
+    "retry": "Retry"
+  },
+  "search": {
+    "title": "Search",
+    "subtitle": "Find news across FútHoy and aggregated sources.",
+    "placeholder": "Search teams, players, leagues…",
+    "hint": "Type a team, player, or topic to search all news.",
+    "noResultsTitle": "No matches found",
+    "noResultsMessage": "No news found for \"{query}\". Try another term.",
+    "resultsCount": "{count, plural, one {# result} other {# results}}"
   },
   "footer": {
     "about": "About",

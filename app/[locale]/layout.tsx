@@ -9,6 +9,7 @@ import { BreakingTicker } from '@/components/layout/BreakingTicker';
 import { NewsletterCTA } from '@/components/layout/NewsletterCTA';
 import { Footer } from '@/components/layout/Footer';
 import { getBreakingNews } from '@/lib/rss';
+import { StoreProvider } from '@/store/StoreProvider';
 import '../globals.css';
 
 const inter = Inter({
@@ -95,11 +96,13 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Header />
-          <BreakingTicker items={breakingNews} />
-          <main className="flex-1">{children}</main>
-          <NewsletterCTA />
-          <Footer />
+          <StoreProvider>
+            <Header />
+            <BreakingTicker items={breakingNews} />
+            <main className="flex-1">{children}</main>
+            <NewsletterCTA />
+            <Footer />
+          </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>

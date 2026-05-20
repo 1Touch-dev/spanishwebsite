@@ -1,10 +1,13 @@
 import { cache } from 'react';
 import type { LiveMatch, StandingRow, TopScorer } from './types';
 import { createTimedCache } from './memory-cache';
-
-const standingsCache = createTimedCache<StandingRow[]>(10 * 60 * 1000);
-const matchesCache = createTimedCache<LiveMatch[]>(60 * 1000);
-const scorersCache = createTimedCache<TopScorer[]>(60 * 60 * 1000);
+import { resolveCountryLeague } from './country-leagues';
+import {
+  fetchCmsLiveMatches,
+  fetchCmsMatchesForLeague,
+  fetchCmsStandings,
+  fetchCmsTopScorers,
+} from './api-football-cms';
 
 const FOOTBALL_DATA_BASE = 'https://api.football-data.org/v4';
 const LA_LIGA_CODE = 'PD';
@@ -34,7 +37,40 @@ async function fdFetch<T>(path: string): Promise<T | null> {
   }
 }
 
-// ---------- Standings ----------
+// ---------- Keyed memory caches (per country/tab) ----------
+
+const standingsCaches = new Map<string, ReturnType<typeof createTimedCache<StandingRow[]>>>();
+const matchesCaches = new Map<string, ReturnType<typeof createTimedCache<LiveMatch[]>>>();
+const scorersCaches = new Map<string, ReturnType<typeof createTimedCache<TopScorer[]>>>();
+
+function getStandingsCache(key: string) {
+  let c = standingsCaches.get(key);
+  if (!c) {
+    c = createTimedCache<StandingRow[]>(10 * 60 * 1000);
+    standingsCaches.set(key, c);
+  }
+  return c;
+}
+
+function getMatchesCache(key: string) {
+  let c = matchesCaches.get(key);
+  if (!c) {
+    c = createTimedCache<LiveMatch[]>(60 * 1000);
+    matchesCaches.set(key, c);
+  }
+  return c;
+}
+
+function getScorersCache(key: string) {
+  let c = scorersCaches.get(key);
+  if (!c) {
+    c = createTimedCache<TopScorer[]>(60 * 60 * 1000);
+    scorersCaches.set(key, c);
+  }
+  return c;
+}
+
+// ---------- Football-Data.org (fallback) types ----------
 
 interface FDStandingsResponse {
   standings: Array<{
@@ -51,33 +87,6 @@ interface FDStandingsResponse {
     }>;
   }>;
 }
-
-async function fetchStandingsRaw(competition = LA_LIGA_CODE): Promise<StandingRow[]> {
-  const data = await fdFetch<FDStandingsResponse>(`/competitions/${competition}/standings`);
-  if (!data) return FALLBACK_STANDINGS;
-
-  const totalTable = data.standings.find((s) => s.type === 'TOTAL');
-  if (!totalTable) return FALLBACK_STANDINGS;
-
-  return totalTable.table.map((row) => ({
-    position: row.position,
-    team: row.team.name,
-    teamShort: row.team.shortName || row.team.tla,
-    crest: row.team.crest,
-    played: row.playedGames,
-    won: row.won,
-    draw: row.draw,
-    lost: row.lost,
-    goalDifference: row.goalDifference,
-    points: row.points,
-  }));
-}
-
-export const getStandings = cache(async (): Promise<StandingRow[]> => {
-  return standingsCache(() => fetchStandingsRaw());
-});
-
-// ---------- Live Matches ----------
 
 interface FDMatchesResponse {
   matches: Array<{
@@ -96,7 +105,34 @@ interface FDMatchesResponse {
   }>;
 }
 
-async function fetchLiveMatchesRaw(): Promise<LiveMatch[]> {
+interface FDScorersResponse {
+  scorers: Array<{
+    player: { name: string };
+    team: { name: string; shortName: string; crest: string };
+    goals: number;
+  }>;
+}
+
+async function fetchStandingsFromFD(): Promise<StandingRow[] | null> {
+  const data = await fdFetch<FDStandingsResponse>(`/competitions/${LA_LIGA_CODE}/standings`);
+  if (!data) return null;
+  const totalTable = data.standings.find((s) => s.type === 'TOTAL');
+  if (!totalTable) return null;
+  return totalTable.table.map((row) => ({
+    position: row.position,
+    team: row.team.name,
+    teamShort: row.team.shortName || row.team.tla,
+    crest: row.team.crest,
+    played: row.playedGames,
+    won: row.won,
+    draw: row.draw,
+    lost: row.lost,
+    goalDifference: row.goalDifference,
+    points: row.points,
+  }));
+}
+
+async function fetchLiveMatchesFromFD(): Promise<LiveMatch[] | null> {
   const today = new Date();
   const from = new Date(today);
   from.setDate(from.getDate() - 1);
@@ -105,9 +141,9 @@ async function fetchLiveMatchesRaw(): Promise<LiveMatch[]> {
   const fmt = (d: Date) => d.toISOString().split('T')[0];
 
   const data = await fdFetch<FDMatchesResponse>(
-    `/matches?dateFrom=${fmt(from)}&dateTo=${fmt(to)}&competitions=${LA_LIGA_CODE},${UCL_CODE}`
+    `/matches?dateFrom=${fmt(from)}&dateTo=${fmt(to)}&competitions=${LA_LIGA_CODE},${UCL_CODE}`,
   );
-  if (!data) return FALLBACK_MATCHES;
+  if (!data) return null;
 
   return data.matches
     .map((m): LiveMatch => ({
@@ -129,24 +165,9 @@ async function fetchLiveMatchesRaw(): Promise<LiveMatch[]> {
     });
 }
 
-export const getLiveMatches = cache(async (): Promise<LiveMatch[]> => {
-  return matchesCache(() => fetchLiveMatchesRaw());
-});
-
-// ---------- Top Scorers ----------
-
-interface FDScorersResponse {
-  scorers: Array<{
-    player: { name: string };
-    team: { name: string; shortName: string; crest: string };
-    goals: number;
-  }>;
-}
-
-async function fetchTopScorersRaw(): Promise<TopScorer[]> {
+async function fetchTopScorersFromFD(): Promise<TopScorer[] | null> {
   const data = await fdFetch<FDScorersResponse>(`/competitions/${LA_LIGA_CODE}/scorers?limit=10`);
-  if (!data) return FALLBACK_SCORERS;
-
+  if (!data) return null;
   return data.scorers.map((s) => ({
     name: s.player.name,
     team: s.team.shortName || s.team.name,
@@ -155,11 +176,63 @@ async function fetchTopScorersRaw(): Promise<TopScorer[]> {
   }));
 }
 
-export const getTopScorers = cache(async (): Promise<TopScorer[]> => {
-  return scorersCache(() => fetchTopScorersRaw());
+// ---------- Public API (cached + countryId-aware) ----------
+
+export const getStandings = cache(async (countryId?: string): Promise<StandingRow[]> => {
+  const cfg = resolveCountryLeague(countryId);
+  const key = `${cfg.countryId}:${cfg.leagueId}:${cfg.season}`;
+  return getStandingsCache(key)(async () => {
+    const cms = await fetchCmsStandings(cfg.leagueId, cfg.season);
+    if (cms && cms.length > 0) return cms;
+
+    if (cfg.countryId === 'spain') {
+      const fd = await fetchStandingsFromFD();
+      if (fd && fd.length > 0) return fd;
+    }
+    return FALLBACK_STANDINGS;
+  });
 });
 
-// ---------- Fallback Data (used when no API token) ----------
+export const getTopScorers = cache(async (countryId?: string): Promise<TopScorer[]> => {
+  const cfg = resolveCountryLeague(countryId);
+  const key = `${cfg.countryId}:${cfg.leagueId}:${cfg.season}`;
+  return getScorersCache(key)(async () => {
+    const cms = await fetchCmsTopScorers(cfg.leagueId, cfg.season);
+    if (cms && cms.length > 0) return cms;
+
+    if (cfg.countryId === 'spain') {
+      const fd = await fetchTopScorersFromFD();
+      if (fd && fd.length > 0) return fd;
+    }
+    return FALLBACK_SCORERS;
+  });
+});
+
+export const getLiveMatches = cache(
+  async (
+    countryId?: string,
+    tab: 'live' | 'upcoming' | 'results' = 'live',
+  ): Promise<LiveMatch[]> => {
+    const cfg = resolveCountryLeague(countryId);
+    const key = `${cfg.countryId}:${cfg.leagueId}:${cfg.season}:${tab}`;
+    return getMatchesCache(key)(async () => {
+      const cms = await fetchCmsMatchesForLeague(cfg.leagueId, cfg.season, tab);
+      if (cms && cms.length > 0) return cms;
+
+      if (cfg.countryId === 'spain') {
+        if (tab === 'live') {
+          const liveOnly = await fetchCmsLiveMatches(cfg.leagueId);
+          if (liveOnly && liveOnly.length > 0) return liveOnly;
+        }
+        const fd = await fetchLiveMatchesFromFD();
+        if (fd && fd.length > 0) return fd;
+      }
+      return FALLBACK_MATCHES;
+    });
+  },
+);
+
+// ---------- Fallback Data (used when no API token / CMS) ----------
 
 const FALLBACK_STANDINGS: StandingRow[] = [
   { position: 1, team: 'Real Madrid CF', teamShort: 'Real Madrid', played: 34, won: 26, draw: 6, lost: 2, goalDifference: 46, points: 84 },
