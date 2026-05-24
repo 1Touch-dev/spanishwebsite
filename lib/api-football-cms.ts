@@ -1,4 +1,18 @@
-import type { LiveMatch, MatchStatus, StandingRow, TopScorer } from '@/types';
+import type {
+  FixtureDetail,
+  LiveMatch,
+  MatchDetailPayload,
+  MatchEvent,
+  MatchLineup,
+  MatchStat,
+  MatchStatus,
+  PlayerInfo,
+  PlayerStatistics,
+  SquadPlayer,
+  StandingRow,
+  TeamInfo,
+  TopScorer,
+} from '@/types';
 import { FOOTBALL_ENDPOINTS } from './football-endpoints';
 
 /**
@@ -78,7 +92,7 @@ export interface ApiFootballFixture {
     date: string;
     status: { short: string; long?: string; elapsed?: number | null };
   };
-  league: { id: number; name: string; round?: string; logo?: string };
+  league: { id: number; name: string; season?: number; round?: string; logo?: string };
   teams: {
     home: ApiFootballTeam & { winner?: boolean | null };
     away: ApiFootballTeam & { winner?: boolean | null };
@@ -152,6 +166,8 @@ export function mapFixtureToLiveMatch(fx: ApiFootballFixture): LiveMatch {
     competition: fx.league?.name ?? '',
     homeTeam: fx.teams.home.name,
     awayTeam: fx.teams.away.name,
+    homeTeamId: fx.teams.home.id,
+    awayTeamId: fx.teams.away.id,
     homeCrest: fx.teams.home.logo,
     awayCrest: fx.teams.away.logo,
     homeScore: fx.goals?.home ?? fx.score?.fulltime?.home ?? null,
@@ -174,6 +190,7 @@ export function mapStandingsToRows(payload: unknown): StandingRow[] {
     position: row.rank,
     team: row.team.name,
     teamShort: row.team.name,
+    teamId: row.team.id,
     crest: row.team.logo,
     played: row.all.played,
     won: row.all.win,
@@ -190,12 +207,266 @@ export function mapTopScorersToRows(payload: unknown, limit = 10): TopScorer[] {
     const stat = p.statistics?.[0];
     return {
       name: p.player.name,
+      playerId: p.player.id,
       team: stat?.team?.name ?? '',
+      teamId: stat?.team?.id,
       goals: stat?.goals?.total ?? 0,
       crest: stat?.team?.logo,
       photo: p.player.photo,
     };
   });
+}
+
+function getDefaultSeason(): number {
+  const raw = process.env.FOOTBALL_API_SEASON;
+  if (raw) {
+    const parsed = Number.parseInt(raw, 10);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 2025;
+}
+
+// ---------- Detail page fetchers ----------
+
+function mergePreferFetched<T>(fetched: T[], embedded: T[]): T[] {
+  return fetched.length > 0 ? fetched : embedded;
+}
+
+export async function fetchCmsFixtureRaw(fixtureId: string): Promise<unknown | null> {
+  const id = fixtureId.trim();
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.fixtures, { id }, { revalidate: 60 });
+  const fixtures = extractResponse<unknown>(payload);
+  return fixtures[0] ?? null;
+}
+
+/** Normalise CMS / API-Football fixture documents to {@link FixtureDetail}. */
+export function normalizeFixtureDetail(raw: unknown): FixtureDetail | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const doc = raw as Record<string, unknown>;
+
+  if (doc.teams && doc.league && doc.goals) {
+    const inner = doc.fixture;
+    if (inner && typeof inner === 'object') {
+      const fx = inner as Record<string, unknown>;
+      if (fx.fixture && typeof fx.fixture === 'object') {
+        const core = fx.fixture as FixtureDetail['fixture'];
+        return {
+          fixture: {
+            ...core,
+            venue:
+              (fx.venue as FixtureDetail['fixture']['venue']) ??
+              core.venue ??
+              null,
+          },
+          league: (doc.league ?? fx.league) as FixtureDetail['league'],
+          teams: doc.teams as FixtureDetail['teams'],
+          goals: doc.goals as FixtureDetail['goals'],
+          score: (doc.score ?? fx.score) as FixtureDetail['score'],
+        };
+      }
+      return {
+        fixture: inner as FixtureDetail['fixture'],
+        league: doc.league as FixtureDetail['league'],
+        teams: doc.teams as FixtureDetail['teams'],
+        goals: doc.goals as FixtureDetail['goals'],
+        score: doc.score as FixtureDetail['score'],
+      };
+    }
+  }
+
+  return null;
+}
+
+export function extractFixtureEmbedded(raw: unknown): {
+  events: MatchEvent[];
+  stats: MatchStat[];
+  lineups: MatchLineup[];
+} {
+  if (!raw || typeof raw !== 'object') {
+    return { events: [], stats: [], lineups: [] };
+  }
+  const doc = raw as Record<string, unknown>;
+  return {
+    events: Array.isArray(doc.events) ? (doc.events as MatchEvent[]) : [],
+    stats: Array.isArray(doc.statistics) ? (doc.statistics as MatchStat[]) : [],
+    lineups: Array.isArray(doc.lineups) ? (doc.lineups as MatchLineup[]) : [],
+  };
+}
+
+export async function fetchCmsFixtureById(fixtureId: string): Promise<FixtureDetail | null> {
+  const raw = await fetchCmsFixtureRaw(fixtureId);
+  return normalizeFixtureDetail(raw);
+}
+
+export async function fetchCmsLineups(fixtureId: string): Promise<MatchLineup[]> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.lineups, {
+    fixture: fixtureId,
+  }, { revalidate: 60 });
+  if (!payload) return [];
+  return extractResponse<MatchLineup>(payload);
+}
+
+export async function fetchCmsEvents(fixtureId: string): Promise<MatchEvent[]> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.events, {
+    fixture: fixtureId,
+  }, { revalidate: 60 });
+  if (!payload) return [];
+  return extractResponse<MatchEvent>(payload);
+}
+
+export async function fetchCmsMatchStats(fixtureId: string): Promise<MatchStat[]> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.stats, {
+    fixture: fixtureId,
+  }, { revalidate: 60 });
+  if (!payload) return [];
+  return extractResponse<MatchStat>(payload);
+}
+
+export async function fetchCmsH2H(fixtureId: string): Promise<FixtureDetail[]> {
+  const fixture = await fetchCmsFixtureById(fixtureId);
+  const homeId = fixture?.teams?.home?.id;
+  const awayId = fixture?.teams?.away?.id;
+  if (!homeId || !awayId) return [];
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.headToHead, {
+    h2h: `${homeId}-${awayId}`,
+    last: 5,
+  }, { revalidate: 300 });
+  if (!payload) return [];
+  return extractResponse<ApiFootballFixture>(payload) as FixtureDetail[];
+}
+
+/** Aggregates fixture + lineups + events + stats + H2H with embedded CMS fallbacks. */
+export async function fetchMatchDetailPayload(fixtureId: string): Promise<MatchDetailPayload> {
+  const raw = await fetchCmsFixtureRaw(fixtureId);
+  const fixture = normalizeFixtureDetail(raw);
+  const embedded = extractFixtureEmbedded(raw);
+
+  const [lineups, events, stats] = await Promise.all([
+    fetchCmsLineups(fixtureId),
+    fetchCmsEvents(fixtureId),
+    fetchCmsMatchStats(fixtureId),
+  ]);
+
+  let h2h: FixtureDetail[] = [];
+  const homeId = fixture?.teams?.home?.id;
+  const awayId = fixture?.teams?.away?.id;
+  if (homeId && awayId) {
+    const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.headToHead, {
+      h2h: `${homeId}-${awayId}`,
+      last: 5,
+    }, { revalidate: 300 });
+    if (payload) {
+      h2h = extractResponse<ApiFootballFixture>(payload) as FixtureDetail[];
+    }
+  }
+
+  return {
+    fixture,
+    lineups: mergePreferFetched(lineups, embedded.lineups),
+    events: mergePreferFetched(events, embedded.events),
+    stats: mergePreferFetched(stats, embedded.stats),
+    h2h,
+  };
+}
+
+export async function fetchCmsPlayerById(playerId: string): Promise<{
+  player: PlayerInfo | null;
+  statistics: PlayerStatistics[];
+}> {
+  const season = getDefaultSeason();
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.players, {
+    id: playerId,
+    season,
+  }, { revalidate: 300 });
+  if (!payload) return { player: null, statistics: [] };
+
+  interface ApiPlayerResponse {
+    player: PlayerInfo;
+    statistics: PlayerStatistics[];
+  }
+  const entries = extractResponse<ApiPlayerResponse>(payload);
+  const first = entries[0];
+  if (!first) return { player: null, statistics: [] };
+  return {
+    player: first.player ?? null,
+    statistics: first.statistics ?? [],
+  };
+}
+
+export async function fetchCmsPlayerFixtures(playerId: string): Promise<LiveMatch[] | null> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.fixtures, {
+    player: playerId,
+    last: 5,
+  }, { revalidate: 120 });
+  if (!payload) return null;
+  const fixtures = extractResponse<ApiFootballFixture>(payload);
+  return fixtures.map(mapFixtureToLiveMatch);
+}
+
+export async function fetchCmsTeamById(teamId: string): Promise<TeamInfo | null> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.teams, {
+    id: teamId,
+  }, { revalidate: 300 });
+  if (!payload) {
+    const alt = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.teams, { team: teamId }, {
+      revalidate: 300,
+    });
+    if (!alt) return null;
+    const teams = extractResponse<{ team: TeamInfo }>(alt);
+    return teams[0]?.team ?? (extractResponse<TeamInfo>(alt)[0] ?? null);
+  }
+  const wrapped = extractResponse<{ team: TeamInfo }>(payload);
+  if (wrapped[0]?.team) return wrapped[0].team;
+  return extractResponse<TeamInfo>(payload)[0] ?? null;
+}
+
+export async function fetchCmsTeamSquad(teamId: string): Promise<SquadPlayer[]> {
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.playersSquads, {
+    team: teamId,
+  }, { revalidate: 600 });
+  if (!payload) return [];
+
+  interface SquadResponse {
+    team?: TeamInfo;
+    players?: SquadPlayer[];
+  }
+  const entries = extractResponse<SquadResponse>(payload);
+  const first = entries[0];
+  if (first?.players?.length) return first.players;
+  return extractResponse<SquadPlayer>(payload);
+}
+
+export async function fetchCmsTeamFixtures(
+  teamId: string,
+  params: { next?: number; last?: number; season?: number } = {},
+): Promise<LiveMatch[] | null> {
+  const season = params.season ?? getDefaultSeason();
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.fixtures, {
+    team: teamId,
+    season,
+    ...(params.next ? { next: params.next } : {}),
+    ...(params.last ? { last: params.last } : {}),
+  }, { revalidate: 60 });
+  if (!payload) return null;
+  const fixtures = extractResponse<ApiFootballFixture>(payload);
+  return fixtures.map(mapFixtureToLiveMatch);
+}
+
+export async function resolveTeamLeagueFromFixtures(
+  teamId: string,
+): Promise<{ leagueId: number; season: number } | null> {
+  const recent = await fetchCmsTeamFixtures(teamId, { last: 1 });
+  if (!recent?.length) return null;
+  const payload = await cmsFetch<unknown>(FOOTBALL_ENDPOINTS.fixtures, {
+    id: recent[0].id,
+  }, { revalidate: 300 });
+  const fixtures = extractResponse<ApiFootballFixture>(payload);
+  const fx = fixtures[0];
+  if (!fx?.league?.id) return null;
+  return {
+    leagueId: fx.league.id,
+    season: fx.league.season ?? getDefaultSeason(),
+  };
 }
 
 // ---------- Public fetchers ----------

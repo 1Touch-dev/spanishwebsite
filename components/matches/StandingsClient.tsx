@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchRankings } from '@/store/features/rankingsSlice';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -66,7 +67,15 @@ export function StandingsClient() {
                   <td className="px-3 py-2.5 font-bold tabular-nums text-brand-navy">
                     {row.position}
                   </td>
-                  <td className="px-3 py-2.5 font-semibold text-brand-navy">{row.team}</td>
+                  <td className="px-3 py-2.5 font-semibold text-brand-navy">
+                    {row.teamId ? (
+                      <Link href={`/teams/${row.teamId}`} className="hover:text-brand-red">
+                        {row.team}
+                      </Link>
+                    ) : (
+                      row.team
+                    )}
+                  </td>
                   <td className="px-3 py-2.5 text-center tabular-nums">{row.played}</td>
                   <td className="px-3 py-2.5 text-center tabular-nums">{row.won}</td>
                   <td className="px-3 py-2.5 text-center tabular-nums">{row.draw}</td>

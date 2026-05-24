@@ -8,6 +8,11 @@ function resolveBaseURL(): string {
   if (explicit) {
     return explicit.startsWith('http') ? explicit : `https://${explicit}`;
   }
+  const appId = process.env.AWS_APP_ID;
+  const branch = process.env.AWS_BRANCH;
+  if (appId && branch) {
+    return `https://${branch}.${appId}.amplifyapp.com`;
+  }
   const port = process.env.PORT || '3000';
   return `http://localhost:${port}`;
 }

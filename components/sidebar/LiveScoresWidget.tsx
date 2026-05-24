@@ -30,7 +30,10 @@ function MatchRow({ match }: { match: LiveMatch }) {
   const showScores = match.homeScore !== null && match.awayScore !== null;
 
   return (
-    <div className="flex items-center justify-between gap-3 py-2">
+    <Link
+      href={`/matches/${match.id}`}
+      className="flex items-center justify-between gap-3 py-2 transition-colors hover:bg-brand-surface rounded px-1 -mx-1"
+    >
       <div className="flex items-center gap-2 text-xs font-semibold">
         <span
           className={`inline-block h-2 w-2 rounded-full ${
@@ -48,7 +51,7 @@ function MatchRow({ match }: { match: LiveMatch }) {
         </span>
         <span className="font-semibold text-brand-navy truncate text-right">{match.awayTeam}</span>
       </div>
-    </div>
+    </Link>
   );
 }
 

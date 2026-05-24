@@ -4,30 +4,11 @@ import { useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMatches } from '@/store/features/matchesSlice';
+import { MatchCardRow } from '@/components/matches/MatchCardRow';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import type { LiveMatch } from '@/types';
-
-function statusBadge(status: LiveMatch['status']) {
-  if (status === 'IN_PLAY' || status === 'LIVE')
-    return (
-      <span className="rounded bg-brand-red px-2 py-0.5 text-xs font-bold text-white animate-pulse-live">
-        EN VIVO
-      </span>
-    );
-  if (status === 'FINISHED' || status === 'FT')
-    return (
-      <span className="rounded bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-700">FT</span>
-    );
-  if (status === 'HT' || status === 'PAUSED')
-    return (
-      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700">HT</span>
-    );
-  return (
-    <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">Próx.</span>
-  );
-}
 
 export function MatchesClient() {
   const dispatch = useAppDispatch();
@@ -48,16 +29,35 @@ export function MatchesClient() {
     }, {} as Record<string, LiveMatch[]>);
   }, [matches]);
 
+  const liveCount = matches.filter(
+    (m) => m.status === 'IN_PLAY' || m.status === 'LIVE',
+  ).length;
+
   return (
     <div className="container-fh py-6">
-      <h1 className="mb-6 font-display text-3xl font-extrabold text-brand-navy">
-        {tSide('liveScores')}
-      </h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-extrabold text-brand-navy sm:text-4xl">
+            {tSide('liveScores')}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {matches.length > 0
+              ? `${matches.length} partidos · ${liveCount > 0 ? `${liveCount} en vivo` : 'actualizado al momento'}`
+              : 'Resultados y horarios'}
+          </p>
+        </div>
+        {liveCount > 0 ? (
+          <span className="inline-flex items-center gap-2 rounded-full bg-brand-red/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-red">
+            <span className="h-2 w-2 rounded-full bg-brand-red animate-pulse-live" />
+            {liveCount} en vivo
+          </span>
+        ) : null}
+      </div>
 
       {status === 'loading' && (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-14 w-full" />
+        <div className="space-y-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}
         </div>
       )}
@@ -78,33 +78,18 @@ export function MatchesClient() {
       {status === 'succeeded' &&
         Object.entries(byCompetition).map(([comp, list]) => (
           <section key={comp} className="mb-8">
-            <h2 className="mb-3 font-display text-lg font-bold uppercase tracking-wide text-slate-600">
-              {comp}
-            </h2>
-            <div className="overflow-hidden rounded-lg bg-white shadow-card">
-              <ul className="divide-y divide-brand-border">
-                {list.map((m) => (
-                  <li
-                    key={m.id}
-                    className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-3 px-4 py-3"
-                  >
-                    <div className="w-16">{statusBadge(m.status)}</div>
-                    <span className="text-right font-semibold text-brand-navy truncate">
-                      {m.homeTeam}
-                    </span>
-                    <span className="font-display text-lg font-extrabold tabular-nums text-brand-navy">
-                      {m.homeScore ?? '–'} <span className="opacity-30">–</span> {m.awayScore ?? '–'}
-                    </span>
-                    <span className="font-semibold text-brand-navy truncate">{m.awayTeam}</span>
-                    <span className="text-xs text-slate-400 tabular-nums">
-                      {new Date(m.utcDate).toLocaleTimeString('es-ES', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+            <div className="mb-3 flex items-center gap-2 border-l-4 border-brand-red pl-3">
+              <h2 className="font-display text-lg font-extrabold uppercase tracking-wide text-brand-navy">
+                {comp}
+              </h2>
+              <span className="rounded-full bg-brand-surface px-2 py-0.5 text-[11px] font-bold text-slate-500">
+                {list.length}
+              </span>
+            </div>
+            <div className="overflow-hidden rounded-2xl border border-brand-border bg-white shadow-card">
+              {list.map((m) => (
+                <MatchCardRow key={m.id} match={m} />
+              ))}
             </div>
           </section>
         ))}

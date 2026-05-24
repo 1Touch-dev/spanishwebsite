@@ -12,6 +12,8 @@ export interface LiveMatch {
   competition: string;
   homeTeam: string;
   awayTeam: string;
+  homeTeamId?: number;
+  awayTeamId?: number;
   homeCrest?: string;
   awayCrest?: string;
   homeScore: number | null;

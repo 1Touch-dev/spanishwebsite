@@ -12,6 +12,7 @@ import { ErrorState } from '@/components/ui/ErrorState';
 interface StandingsTableProps {
   limit?: number;
   showLink?: boolean;
+  autoFetch?: boolean;
 }
 
 function positionColor(pos: number): string {
@@ -21,17 +22,17 @@ function positionColor(pos: number): string {
   return 'bg-transparent';
 }
 
-export function StandingsTable({ limit = 5, showLink = true }: StandingsTableProps) {
+export function StandingsTable({ limit = 5, showLink = true, autoFetch = true }: StandingsTableProps) {
   const dispatch = useAppDispatch();
   const t = useTranslations('sidebar');
   const tTable = useTranslations('table');
   const { standings, status, error } = useAppSelector((s) => s.rankings);
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (autoFetch && status === 'idle') {
       void dispatch(fetchRankings());
     }
-  }, [dispatch, status]);
+  }, [autoFetch, dispatch, status]);
 
   const slice = standings.slice(0, limit);
 
@@ -85,7 +86,13 @@ export function StandingsTable({ limit = 5, showLink = true }: StandingsTablePro
                     </span>
                   </td>
                   <td className="py-1.5 pr-2 font-semibold text-brand-navy truncate max-w-[120px]">
-                    {row.teamShort}
+                    {row.teamId ? (
+                      <Link href={`/teams/${row.teamId}`} className="hover:text-brand-red">
+                        {row.teamShort}
+                      </Link>
+                    ) : (
+                      row.teamShort
+                    )}
                   </td>
                   <td className="py-1.5 px-1 text-center text-slate-600 tabular-nums">{row.played}</td>
                   <td className="py-1.5 px-1 text-center text-slate-600 tabular-nums">

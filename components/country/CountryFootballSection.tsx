@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMatches } from '@/store/features/matchesSlice';
 import { fetchRankings } from '@/store/features/rankingsSlice';
@@ -117,10 +118,11 @@ export function CountryFootballSection({ country }: CountryFootballSectionProps)
           <div className="overflow-hidden rounded-lg bg-white shadow-card">
             <ul className="divide-y divide-brand-border">
               {matchesForCountry.slice(0, 8).map((m) => (
-                <li
-                  key={m.id}
-                  className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-3 px-4 py-3"
-                >
+                <li key={m.id}>
+                  <Link
+                    href={`/matches/${m.id}`}
+                    className="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-3 px-4 py-3 transition-colors hover:bg-brand-surface"
+                  >
                   <div className="w-16">{statusBadge(m.status)}</div>
                   <span className="truncate text-right font-semibold text-brand-navy">
                     {m.homeTeam}
@@ -136,6 +138,7 @@ export function CountryFootballSection({ country }: CountryFootballSectionProps)
                       minute: '2-digit',
                     })}
                   </span>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -187,7 +190,13 @@ export function CountryFootballSection({ country }: CountryFootballSectionProps)
                       {row.position}
                     </td>
                     <td className="py-1.5 pr-2 font-semibold text-brand-navy truncate max-w-[140px]">
-                      {row.teamShort || row.team}
+                      {row.teamId ? (
+                        <Link href={`/teams/${row.teamId}`} className="hover:text-brand-red">
+                          {row.teamShort || row.team}
+                        </Link>
+                      ) : (
+                        row.teamShort || row.team
+                      )}
                     </td>
                     <td className="py-1.5 px-1 text-center text-slate-600 tabular-nums">
                       {row.played}
@@ -230,10 +239,25 @@ export function CountryFootballSection({ country }: CountryFootballSectionProps)
                     <span className="w-5 text-right font-bold text-slate-400 tabular-nums">
                       {i + 1}
                     </span>
-                    <span className="truncate font-semibold text-brand-navy">
-                      {p.name}
+                    {p.playerId ? (
+                      <Link
+                        href={`/players/${p.playerId}`}
+                        className="truncate font-semibold text-brand-navy hover:text-brand-red"
+                      >
+                        {p.name}
+                      </Link>
+                    ) : (
+                      <span className="truncate font-semibold text-brand-navy">{p.name}</span>
+                    )}
+                    <span className="truncate text-xs text-slate-500">
+                      {p.teamId ? (
+                        <Link href={`/teams/${p.teamId}`} className="hover:text-brand-red">
+                          {p.team}
+                        </Link>
+                      ) : (
+                        p.team
+                      )}
                     </span>
-                    <span className="truncate text-xs text-slate-500">{p.team}</span>
                   </span>
                   <span className="font-display text-base font-extrabold tabular-nums text-brand-red">
                     {p.goals}

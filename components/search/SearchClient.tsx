@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Search } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchNews } from '@/store/features/newsSlice';
 import { NewsCard } from '@/components/home/NewsCard';
@@ -18,13 +18,19 @@ function matchesQuery(
   return haystack.includes(query);
 }
 
-export function SearchClient() {
+function SearchResults() {
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
   const t = useTranslations('search');
   const tStates = useTranslations('states');
-  const [query, setQuery] = useState('');
+  const qParam = searchParams.get('q') ?? '';
+  const [query, setQuery] = useState(qParam);
 
   const { articles, status, error } = useAppSelector((s) => s.news);
+
+  useEffect(() => {
+    setQuery(qParam);
+  }, [qParam]);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -38,29 +44,20 @@ export function SearchClient() {
     return articles.filter((item) => matchesQuery(item, trimmed));
   }, [articles, trimmed]);
 
+  if (!trimmed) {
+    return (
+      <p className="container-fh py-12 text-center text-sm text-slate-500">{t('useHeaderSearch')}</p>
+    );
+  }
+
   return (
     <section className="container-fh py-8">
-      <h1 className="font-display text-3xl font-extrabold text-brand-navy">{t('title')}</h1>
-      <p className="mt-2 max-w-xl text-sm text-slate-600">{t('subtitle')}</p>
-
-      <div className="relative mt-6 max-w-2xl">
-        <Search
-          className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-          aria-hidden
-        />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t('placeholder')}
-          autoFocus
-          className="w-full rounded-xl border border-brand-border bg-white py-3 pl-12 pr-4 text-brand-navy shadow-card outline-none transition-shadow focus:border-brand-red focus:ring-2 focus:ring-brand-red/20"
-          aria-label={t('placeholder')}
-        />
-      </div>
+      <p className="text-sm font-semibold text-slate-600">
+        {t('resultsFor', { query })}
+      </p>
 
       {status === 'loading' && articles.length === 0 && (
-        <div className="mt-8 space-y-3">
+        <div className="mt-6 space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full" />
           ))}
@@ -68,7 +65,7 @@ export function SearchClient() {
       )}
 
       {status === 'failed' && (
-        <div className="mt-8">
+        <div className="mt-6">
           <ErrorState
             title={tStates('errorTitle')}
             message={error ?? tStates('errorMessage')}
@@ -78,14 +75,14 @@ export function SearchClient() {
         </div>
       )}
 
-      {status === 'succeeded' && trimmed && results.length === 0 && (
-        <div className="mt-8">
+      {status === 'succeeded' && results.length === 0 && (
+        <div className="mt-6">
           <EmptyState title={t('noResultsTitle')} message={t('noResultsMessage', { query })} />
         </div>
       )}
 
-      {status === 'succeeded' && trimmed && results.length > 0 && (
-        <div className="mt-8">
+      {status === 'succeeded' && results.length > 0 && (
+        <div className="mt-6">
           <p className="mb-4 text-sm font-semibold text-slate-600">
             {t('resultsCount', { count: results.length })}
           </p>
@@ -96,11 +93,21 @@ export function SearchClient() {
           </div>
         </div>
       )}
-
-      {status === 'succeeded' && !trimmed && (
-        <p className="mt-8 text-sm text-slate-500">{t('hint')}</p>
-      )}
     </section>
+  );
+}
+
+export function SearchClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container-fh py-8">
+          <Skeleton className="h-8 w-48" />
+        </div>
+      }
+    >
+      <SearchResults />
+    </Suspense>
   );
 }
 

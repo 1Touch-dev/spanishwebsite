@@ -5,14 +5,20 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export const NAV_LINKS = [
-  { key: 'news', href: '/news', flag: null },
-  { key: 'worldCup', href: '/world-cup', flag: null },
-  { key: 'mexico', href: '/country/mexico', flag: '🇲🇽' },
-  { key: 'colombia', href: '/country/colombia', flag: '🇨🇴' },
-  { key: 'argentina', href: '/country/argentina', flag: '🇦🇷' },
-  { key: 'spain', href: '/country/spain', flag: '🇪🇸' },
-  { key: 'peru', href: '/country/peru', flag: '🇵🇪' },
+  { key: 'news', href: '/news' },
+  { key: 'matches', href: '/matches' },
+  { key: 'standings', href: '/standings' },
+  { key: 'players', href: '/players' },
+  { key: 'worldCup', href: '/world-cup' },
 ] as const;
+
+export type NavLinkKey = (typeof NAV_LINKS)[number]['key'];
+
+function isNavActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href !== '/' && pathname.startsWith(`${href}/`)) return true;
+  return false;
+}
 
 export function Nav() {
   const t = useTranslations('nav');
@@ -21,19 +27,18 @@ export function Nav() {
   return (
     <nav className="hidden lg:block bg-brand-red">
       <div className="container-fh">
-        <ul className="flex items-center gap-1 text-sm font-semibold text-white/90">
+        <ul className="flex items-center gap-0.5 text-sm font-semibold text-white/90">
           {NAV_LINKS.map((link) => {
-            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+            const isActive = isNavActive(pathname, link.href);
             return (
               <li key={link.key}>
                 <Link
                   href={link.href}
                   className={cn(
-                    'inline-flex items-center gap-1.5 px-4 py-3 transition-colors hover:bg-brand-red-dark hover:text-white',
+                    'inline-flex items-center px-3.5 py-3 transition-colors hover:bg-brand-red-dark hover:text-white xl:px-4',
                     isActive && 'bg-brand-red-dark text-white shadow-inner',
                   )}
                 >
-                  {link.flag ? <span aria-hidden>{link.flag}</span> : null}
                   {t(link.key)}
                 </Link>
               </li>

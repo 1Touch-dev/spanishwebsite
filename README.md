@@ -2,22 +2,28 @@
 
 A modern Spanish football (fútbol) news portal built with Next.js 15, focused on La Liga, Champions League, and Spanish-speaking football audiences.
 
+## Documentation
+
+**Full project guide (structure, stack, patterns, features, API setup):** [`PROJECT_GUIDE.md`](PROJECT_GUIDE.md)
+
+Also see [`CODEBASE_OVERVIEW.md`](CODEBASE_OVERVIEW.md) for a shorter reference.
+
 ## Stack
 
 - **Next.js 15** (App Router, RSC, ISR)
 - **TypeScript** (strict)
-- **Tailwind CSS** v3
+- **Tailwind CSS** v3 + **Redux Toolkit**
 - **next-intl** for Spanish/English i18n
 - **rss-parser** for aggregating MARCA, AS, Mundo Deportivo, Olé
 - **next-mdx-remote** for original articles
-- **Football-Data.org** API for live scores & standings
+- **API-Football CMS proxy** for live scores, standings, match/player/team detail (see `PROJECT_GUIDE.md`)
 
 ## Quick Start
 
 ```bash
 npm install
 cp .env.example .env.local
-# Add your FOOTBALL_DATA_TOKEN (free at football-data.org)
+# Optional: FOOTBALL_API_BASE_URL, FOOTBALL_API_SEASON, FOOTBALL_DATA_TOKEN, NEXT_PUBLIC_SITE_URL
 npm run dev
 ```
 
@@ -52,7 +58,22 @@ Article body in **MDX**. You can use components, images, code, etc.
 
 ## Deployment
 
-Deploy to Vercel:
+### AWS Amplify (recommended)
+
+1. Push this repo to GitHub and open [AWS Amplify Console](https://console.aws.amazon.com/amplify/).
+2. **Create new app → Host web app** → connect `ankur1touch/spanishwebsite`, branch `main`.
+3. Amplify auto-detects **Next.js SSR**; `amplify.yml` in the repo root defines the build.
+4. Under **Environment variables**, set at minimum:
+
+   | Variable | Example |
+   |----------|---------|
+   | `NEXT_PUBLIC_SITE_URL` | `https://main.dxxxxxxxx.amplifyapp.com` (or your custom domain) |
+   | `FOOTBALL_API_SEASON` | `2025` |
+   | `FOOTBALL_DATA_TOKEN` | *(optional fallback)* |
+
+5. Save and deploy. Every push to `main` triggers a new build.
+
+### Vercel
 
 ```bash
 vercel

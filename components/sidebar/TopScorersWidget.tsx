@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchRankings } from '@/store/features/rankingsSlice';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -15,16 +16,20 @@ function initials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function TopScorersWidget() {
+interface TopScorersWidgetProps {
+  autoFetch?: boolean;
+}
+
+export function TopScorersWidget({ autoFetch = true }: TopScorersWidgetProps) {
   const dispatch = useAppDispatch();
   const t = useTranslations('sidebar');
   const { topScorers, status, error } = useAppSelector((s) => s.rankings);
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (autoFetch && status === 'idle') {
       void dispatch(fetchRankings());
     }
-  }, [dispatch, status]);
+  }, [autoFetch, dispatch, status]);
 
   const top = topScorers.slice(0, 5);
   const maxGoals = Math.max(...top.map((s) => s.goals), 1);
@@ -69,9 +74,22 @@ export function TopScorersWidget() {
                 {initials(s.name)}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-brand-navy">{s.name}</p>
+                {s.playerId ? (
+                  <Link href={`/players/${s.playerId}`} className="truncate text-sm font-bold text-brand-navy hover:text-brand-red block">
+                    {s.name}
+                  </Link>
+                ) : (
+                  <p className="truncate text-sm font-bold text-brand-navy">{s.name}</p>
+                )}
                 <p className="truncate text-xs text-slate-500">
-                  {s.team} · {s.goals} goles
+                  {s.teamId ? (
+                    <Link href={`/teams/${s.teamId}`} className="hover:text-brand-red">
+                      {s.team}
+                    </Link>
+                  ) : (
+                    s.team
+                  )}{' '}
+                  · {s.goals} goles
                 </p>
                 <div className="mt-1.5 h-1 w-full overflow-hidden rounded bg-brand-surface">
                   <div

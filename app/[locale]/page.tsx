@@ -4,8 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { HomeNewsClient } from '@/components/home/HomeNewsClient';
 import { HighlightVideoCard } from '@/components/home/HighlightVideoCard';
 import { LiveScoresWidget } from '@/components/sidebar/LiveScoresWidget';
-import { StandingsTable } from '@/components/sidebar/StandingsTable';
-import { TopScorersWidget } from '@/components/sidebar/TopScorersWidget';
+import { HomeSidebarData } from '@/components/sidebar/HomeSidebarData';
 
 export const revalidate = 300;
 
@@ -65,8 +64,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
         <aside className="space-y-6 lg:sticky lg:top-32 lg:self-start">
           <LiveScoresWidget />
-          <StandingsTable />
-          <TopScorersWidget />
+          <HomeSidebarData />
         </aside>
       </div>
     </div>

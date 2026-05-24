@@ -3,6 +3,9 @@ import newsReducer from './features/newsSlice';
 import matchesReducer from './features/matchesSlice';
 import rankingsReducer from './features/rankingsSlice';
 import countriesReducer from './features/countriesSlice';
+import matchDetailReducer from './features/matchDetailSlice';
+import playerDetailReducer from './features/playerDetailSlice';
+import teamDetailReducer from './features/teamDetailSlice';
 
 export const makeStore = () =>
   configureStore({
@@ -11,6 +14,9 @@ export const makeStore = () =>
       matches: matchesReducer,
       rankings: rankingsReducer,
       countries: countriesReducer,
+      matchDetail: matchDetailReducer,
+      playerDetail: playerDetailReducer,
+      teamDetail: teamDetailReducer,
     },
     devTools: process.env.NODE_ENV !== 'production',
   });
