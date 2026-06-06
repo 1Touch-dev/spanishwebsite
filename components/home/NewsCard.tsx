@@ -1,6 +1,7 @@
+import { ExternalLink } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { Tag } from '@/components/ui/Tag';
 import { RelativeTime } from '@/components/ui/RelativeTime';
-import { ExternalLink } from 'lucide-react';
 import type { NewsItem } from '@/lib/types';
 
 interface NewsCardProps {
@@ -8,16 +9,8 @@ interface NewsCardProps {
 }
 
 export function NewsCard({ item }: NewsCardProps) {
-  const target = item.isInternal ? undefined : '_blank';
-  const rel = item.isInternal ? undefined : 'noopener noreferrer';
-
-  return (
-    <a
-      href={item.url}
-      target={target}
-      rel={rel}
-      className="group flex gap-4 rounded-lg bg-white p-4 shadow-card transition-all hover:shadow-card-hover hover:-translate-y-0.5"
-    >
+  const content = (
+    <>
       <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-brand-surface sm:h-24 sm:w-28">
         {item.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -36,7 +29,7 @@ export function NewsCard({ item }: NewsCardProps) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col justify-between min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2">
             {item.tag && <Tag label={String(item.tag)} />}
@@ -60,6 +53,28 @@ export function NewsCard({ item }: NewsCardProps) {
           )}
         </p>
       </div>
+    </>
+  );
+
+  if (item.isInternal) {
+    return (
+      <Link
+        href={item.url}
+        className="group flex gap-4 rounded-lg bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex gap-4 rounded-lg bg-white p-4 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
+    >
+      {content}
     </a>
   );
 }

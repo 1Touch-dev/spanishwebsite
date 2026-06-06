@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import { setRequestLocale, getTranslations } from 'next-intl/server';
-import { NewsListingClient } from '@/components/news/NewsListingClient';
 import { Badge } from '@/components/ui/Badge';
+import { NewsListingClient } from '@/components/news/NewsListingClient';
+import { ErrorState } from '@/components/ui/ErrorState';
+import {
+  fetchWorldCupArticles,
+  type GolazoProArticle,
+} from '@/src/lib/cms/golazoProApi';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -27,6 +32,18 @@ export default async function WorldCupPage({
   setRequestLocale(locale);
   const tNav = await getTranslations({ locale, namespace: 'nav' });
 
+  let articles: GolazoProArticle[] = [];
+  let loadError: string | null = null;
+
+  try {
+    const response = await fetchWorldCupArticles(1, 30, {
+      next: { revalidate: 60 },
+    });
+    articles = response.data;
+  } catch (error) {
+    loadError = error instanceof Error ? error.message : 'No pudimos cargar las noticias.';
+  }
+
   return (
     <div>
       <header className="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 py-10">
@@ -38,12 +55,21 @@ export default async function WorldCupPage({
             {tNav('worldCup')}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-brand-navy/80">
-            Toda la actualidad del torneo más importante del fútbol mundial.
+            Toda la actualidad del torneo mas importante del futbol mundial.
           </p>
         </div>
       </header>
 
-      <NewsListingClient initialFilter="worldCup" />
+      {loadError ? (
+        <section className="container-fh py-6">
+          <ErrorState
+            title="No pudimos cargar las noticias"
+            message={loadError}
+          />
+        </section>
+      ) : (
+        <NewsListingClient articles={articles} showTabs={false} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Tag } from '@/components/ui/Tag';
 import { RelativeTime } from '@/components/ui/RelativeTime';
 import type { NewsItem } from '@/lib/types';
@@ -13,17 +14,8 @@ export function HeroCard({ item }: HeroCardProps) {
   const t = useTranslations('home');
   const isExclusive = item.exclusive;
 
-  const href = item.isInternal ? item.url : item.url;
-  const target = item.isInternal ? undefined : '_blank';
-  const rel = item.isInternal ? undefined : 'noopener noreferrer';
-
-  return (
-    <a
-      href={href}
-      target={target}
-      rel={rel}
-      className="group relative block overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
-    >
+  const content = (
+    <>
       {item.image && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -63,6 +55,28 @@ export function HeroCard({ item }: HeroCardProps) {
           )}
         </div>
       </div>
+    </>
+  );
+
+  if (item.isInternal) {
+    return (
+      <Link
+        href={item.url}
+        className="group relative block overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
+    >
+      {content}
     </a>
   );
 }

@@ -98,7 +98,7 @@
 | Technology | Files | Why |
 |------------|-------|-----|
 | **MDX + gray-matter** | `content/articles/*.mdx`, `lib/mdx.ts` | Write articles in Git, version controlled |
-| **next-mdx-remote** | `components/article/ArticleBody.tsx` | Render MDX to React |
+| **react-markdown** | `components/ui/MarkdownRenderer.tsx` | Render Markdown with YouTube/Twitter embeds |
 | **rss-parser** | `lib/rss.ts` | Pull headlines from MARCA, AS, Mundo Deportivo, Olé |
 
 ### Live Football Data

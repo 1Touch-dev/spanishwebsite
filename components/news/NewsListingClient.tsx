@@ -1,60 +1,43 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchNews } from '@/store/features/newsSlice';
 import { NewsCard } from '@/components/home/NewsCard';
 import { Tabs, type TabItem } from '@/components/ui/Tabs';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
-
-type FilterId = 'all' | 'laliga' | 'champions' | 'worldCup' | 'transfers' | 'national' | 'analysis';
-
-const FILTER_MATCHERS: Record<FilterId, string[]> = {
-  all: [],
-  laliga: ['la liga', 'real madrid', 'barça', 'barca', 'atlético', 'atletico'],
-  champions: ['champions', 'uefa'],
-  worldCup: ['mundial', 'world cup', 'copa del mundo'],
-  transfers: ['fichaje', 'fichajes', 'transfer'],
-  national: ['selección', 'seleccion', 'la roja', 'albiceleste', 'tricolor', 'cafetero', 'blanquirroja'],
-  analysis: ['análisis', 'analisis'],
-};
-
-function matchesFilter(item: { title?: string; excerpt?: string; tag?: unknown }, filter: FilterId): boolean {
-  if (filter === 'all') return true;
-  const haystack = `${item.title ?? ''} ${item.excerpt ?? ''} ${String(item.tag ?? '')}`.toLowerCase();
-  return FILTER_MATCHERS[filter].some((needle) => haystack.includes(needle));
-}
+import {
+  mapGolazoProArticleToNewsItem,
+  type GolazoProArticle,
+} from '@/src/lib/cms/golazoProApi';
+import { filterArticlesByTab, type NewsTab } from '@/src/lib/cms/newsTabs';
 
 interface NewsListingClientProps {
-  initialFilter?: FilterId;
+  articles: GolazoProArticle[];
+  initialFilter?: NewsTab;
   title?: string;
   description?: string;
+  showTabs?: boolean;
 }
 
 export function NewsListingClient({
+  articles,
   initialFilter = 'all',
   title,
   description,
+  showTabs = true,
 }: NewsListingClientProps) {
-  const dispatch = useAppDispatch();
   const t = useTranslations('filters');
   const tStates = useTranslations('states');
-  const [filter, setFilter] = useState<FilterId>(initialFilter);
-
-  const { articles, status, error } = useAppSelector((s) => s.news);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      void dispatch(fetchNews());
-    }
-  }, [dispatch, status]);
+  const [filter, setFilter] = useState<NewsTab>(initialFilter);
 
   const filtered = useMemo(
-    () => articles.filter((item) => matchesFilter(item, filter)),
+    () => filterArticlesByTab(articles, filter),
     [articles, filter],
+  );
+
+  const displayArticles = useMemo(
+    () => filtered.map(mapGolazoProArticleToNewsItem),
+    [filtered],
   );
 
   const tabItems: TabItem[] = useMemo(
@@ -83,37 +66,22 @@ export function NewsListingClient({
         </header>
       )}
 
-      <Tabs
-        items={tabItems}
-        activeId={filter}
-        onChange={(id) => setFilter(id as FilterId)}
-        className="mb-6"
-      />
-
-      {status === 'loading' && (
-        <div className="space-y-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full" />
-          ))}
-        </div>
-      )}
-
-      {status === 'failed' && (
-        <ErrorState
-          title={tStates('errorTitle')}
-          message={error ?? tStates('errorMessage')}
-          retryLabel={tStates('retry')}
-          onRetry={() => void dispatch(fetchNews())}
+      {showTabs && (
+        <Tabs
+          items={tabItems}
+          activeId={filter}
+          onChange={(id) => setFilter(id as NewsTab)}
+          className="mb-6"
         />
       )}
 
-      {status === 'succeeded' && filtered.length === 0 && (
+      {displayArticles.length === 0 && (
         <EmptyState title={tStates('emptyTitle')} message={tStates('emptyMessage')} />
       )}
 
-      {status === 'succeeded' && filtered.length > 0 && (
+      {displayArticles.length > 0 && (
         <div className="space-y-3">
-          {filtered.map((item) => (
+          {displayArticles.map((item) => (
             <NewsCard key={item.id} item={item} />
           ))}
         </div>

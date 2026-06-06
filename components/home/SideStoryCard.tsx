@@ -1,3 +1,4 @@
+import { Link } from '@/i18n/navigation';
 import { Tag } from '@/components/ui/Tag';
 import { RelativeTime } from '@/components/ui/RelativeTime';
 import type { NewsItem } from '@/lib/types';
@@ -7,16 +8,8 @@ interface SideStoryCardProps {
 }
 
 export function SideStoryCard({ item }: SideStoryCardProps) {
-  const target = item.isInternal ? undefined : '_blank';
-  const rel = item.isInternal ? undefined : 'noopener noreferrer';
-
-  return (
-    <a
-      href={item.url}
-      target={target}
-      rel={rel}
-      className="group relative block h-full overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
-    >
+  const content = (
+    <>
       {item.image && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -41,6 +34,28 @@ export function SideStoryCard({ item }: SideStoryCardProps) {
           </p>
         </div>
       </div>
+    </>
+  );
+
+  if (item.isInternal) {
+    return (
+      <Link
+        href={item.url}
+        className="group relative block h-full overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block h-full overflow-hidden rounded-lg bg-brand-navy shadow-card transition-shadow hover:shadow-card-hover"
+    >
+      {content}
     </a>
   );
 }

@@ -1,71 +1,87 @@
 import type { Metadata } from 'next';
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { ArticleHeader } from '@/components/article/ArticleHeader';
 import { ArticleBody } from '@/components/article/ArticleBody';
-import { RelatedNews } from '@/components/article/RelatedNews';
-import { getAllArticleSlugs, getArticleBySlug, getRelatedArticles } from '@/lib/mdx';
+import {
+  fetchArticleBySlug,
+  getArticleAuthor,
+  getArticleExcerpt,
+  getArticleImage,
+  mapGolazoProArticleToArticle,
+} from '@/src/lib/cms/golazoProApi';
 
-export const revalidate = 600;
+export const revalidate = 60;
 
 type Params = Promise<{ locale: string; slug: string }>;
 
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllArticleSlugs();
-    return slugs.flatMap((slug) => [
-      { locale: 'es', slug },
-      { locale: 'en', slug },
-    ]);
-  } catch {
-    return [];
-  }
-}
+const getCmsArticle = cache(async (slug: string) =>
+  fetchArticleBySlug(slug, {
+    next: { revalidate: 60 },
+  }),
+);
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-  if (!article) return {};
-  return {
-    title: article.title,
-    description: article.excerpt,
-    openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      type: 'article',
-      publishedTime: article.date,
-      authors: [article.author],
-      images: article.image ? [{ url: article.image }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.title,
-      description: article.excerpt,
-      images: article.image ? [article.image] : [],
-    },
-  };
+
+  try {
+    const article = await getCmsArticle(slug);
+    const image = getArticleImage(article);
+    const title = article.seo?.meta_title || article.title;
+    const description = article.seo?.meta_description || getArticleExcerpt(article);
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        publishedTime: article.createdAt,
+        modifiedTime: article.updatedAt,
+        authors: [getArticleAuthor(article)],
+        images: image ? [{ url: image }] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: image ? [image] : [],
+      },
+    };
+  } catch {
+    return {
+      title: 'Noticia no encontrada',
+    };
+  }
 }
 
 export default async function ArticlePage({ params }: { params: Params }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const article = await getArticleBySlug(slug);
-  if (!article) notFound();
+  let cmsArticle;
+  try {
+    cmsArticle = await getCmsArticle(slug);
+  } catch {
+    notFound();
+  }
 
-  const related = await getRelatedArticles(article.slug, String(article.tag), 3);
-
+  const article = mapGolazoProArticleToArticle(cmsArticle);
+  const image = getArticleImage(cmsArticle);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.title,
     description: article.excerpt,
-    datePublished: article.date,
+    datePublished: cmsArticle.createdAt,
+    dateModified: cmsArticle.updatedAt,
     author: { '@type': 'Person', name: article.author },
-    image: article.image ? [article.image] : undefined,
+    image: image ? [image] : undefined,
     publisher: {
       '@type': 'Organization',
-      name: 'FútHoy',
+      name: 'Golazo Pro',
     },
   };
 
@@ -79,11 +95,11 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
       <ArticleHeader article={article} />
 
-      {article.image && (
+      {image && (
         <div className="mx-auto mt-6 max-w-4xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={article.image}
+            src={image}
             alt={article.title}
             className="w-full rounded-lg object-cover shadow-card"
           />
@@ -91,8 +107,6 @@ export default async function ArticlePage({ params }: { params: Params }) {
       )}
 
       <ArticleBody content={article.content} />
-
-      <RelatedNews articles={related} />
     </article>
   );
 }

@@ -17,10 +17,12 @@
     "lucide-react": "^0.460.0",
     "next": "^15.0.3",
     "next-intl": "^3.26.0",
-    "next-mdx-remote": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-redux": "^9.3.0",
+    "react-twitter-embed": "^4.0.4",
+    "remark-gfm": "^4.0.1",
     "rss-parser": "^3.13.0",
     "sharp": "^0.33.5",
     "tailwind-merge": "^2.5.4"
