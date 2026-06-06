@@ -1,0 +1,15 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PitchPulse Media">
+  <rect width="48" height="48" x="6" y="6" rx="10" fill="#070B14"/>
+  <rect x="6" y="6" width="48" height="3.5" rx="10" fill="#F5A623"/>
+  <rect x="7" y="7" width="46" height="46" rx="9.5" stroke="#F5A623" stroke-width="0.6" stroke-opacity="0.35" fill="none"/>
+  <rect x="15" y="19" width="4" height="22" rx="2" fill="white"/>
+  <rect x="19" y="19" width="10" height="3.5" rx="1.5" fill="white"/>
+  <rect x="25" y="19" width="3.5" height="11" rx="1.5" fill="white"/>
+  <rect x="19" y="27" width="10" height="3.5" rx="1.5" fill="white"/>
+  <rect x="35" y="30" width="3" height="10" rx="1.5" fill="#F5A623" opacity="0.5"/>
+  <rect x="39.5" y="26" width="3" height="14" rx="1.5" fill="#F5A623" opacity="0.75"/>
+  <rect x="44" y="21" width="3" height="19" rx="1.5" fill="#F5A623"/>
+  <text x="64" y="34" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="white" letter-spacing="-0.5">Pitch</text>
+  <text x="114" y="34" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="#F5A623" letter-spacing="-0.5">Pulse</text>
+  <text x="65" y="46" font-family="Arial, sans-serif" font-weight="600" font-size="9.5" fill="rgba(255,255,255,0.38)" letter-spacing="2.5">MEDIA</text>
+</svg>
