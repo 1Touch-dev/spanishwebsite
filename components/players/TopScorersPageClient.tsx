@@ -29,7 +29,7 @@ export function TopScorersPageClient() {
         {t('players')}
       </h1>
       <p className="mb-6 text-sm text-slate-500">
-        {tSide('topScorers')} · La Liga
+        {tSide('topScorers')} | FIFA World Cup 2026
       </p>
 
       {status === 'loading' && (
@@ -81,7 +81,7 @@ export function TopScorersPageClient() {
                   {s.playerId ? (
                     <Link
                       href={`/players/${s.playerId}`}
-                      className="truncate font-bold text-brand-navy hover:text-brand-red block"
+                      className="block truncate font-bold text-brand-navy hover:text-brand-red"
                     >
                       {s.name}
                     </Link>

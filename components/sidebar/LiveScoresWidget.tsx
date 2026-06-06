@@ -16,13 +16,16 @@ function statusInfo(status: LiveMatch['status'], minute?: string): {
   isLive: boolean;
   color: string;
 } {
-  if (status === 'IN_PLAY' || status === 'LIVE')
-    return { label: minute ? `${minute}'` : 'EN VIVO', isLive: true, color: 'text-brand-red' };
-  if (status === 'PAUSED' || status === 'HT')
+  if (status === 'IN_PLAY' || status === 'LIVE') {
+    return { label: minute ? `${minute}'` : 'LIVE', isLive: true, color: 'text-brand-red' };
+  }
+  if (status === 'PAUSED' || status === 'HT') {
     return { label: 'HT', isLive: true, color: 'text-amber-600' };
-  if (status === 'FINISHED' || status === 'FT')
+  }
+  if (status === 'FINISHED' || status === 'FT') {
     return { label: 'FT', isLive: false, color: 'text-slate-500' };
-  return { label: 'Próx.', isLive: false, color: 'text-slate-400' };
+  }
+  return { label: 'Next', isLive: false, color: 'text-slate-400' };
 }
 
 function MatchRow({ match }: { match: LiveMatch }) {
@@ -32,7 +35,7 @@ function MatchRow({ match }: { match: LiveMatch }) {
   return (
     <Link
       href={`/matches/${match.id}`}
-      className="flex items-center justify-between gap-3 py-2 transition-colors hover:bg-brand-surface rounded px-1 -mx-1"
+      className="flex items-center justify-between gap-3 rounded px-1 py-2 transition-colors hover:bg-brand-surface -mx-1"
     >
       <div className="flex items-center gap-2 text-xs font-semibold">
         <span
@@ -40,16 +43,16 @@ function MatchRow({ match }: { match: LiveMatch }) {
             status.isLive ? 'bg-brand-red animate-pulse-live' : 'bg-slate-300'
           }`}
         />
-        <span className={`${status.color} text-[11px] font-bold tracking-wide w-10`}>
+        <span className={`${status.color} w-10 text-[11px] font-bold tracking-wide`}>
           {status.label}
         </span>
       </div>
-      <div className="flex flex-1 items-center justify-between text-sm">
-        <span className="font-semibold text-brand-navy truncate">{match.homeTeam}</span>
-        <span className="mx-3 font-display text-base font-extrabold tabular-nums text-brand-navy">
-          {showScores ? `${match.homeScore} — ${match.awayScore}` : 'vs'}
+      <div className="flex flex-1 items-center text-sm">
+        <span className="truncate flex-1 text-left font-semibold text-brand-navy">{match.homeTeam}</span>
+        <span className="w-14 shrink-0 text-center font-display text-base font-extrabold tabular-nums text-brand-navy">
+          {showScores ? `${match.homeScore} - ${match.awayScore}` : 'vs'}
         </span>
-        <span className="font-semibold text-brand-navy truncate text-right">{match.awayTeam}</span>
+        <span className="truncate flex-1 text-right font-semibold text-brand-navy">{match.awayTeam}</span>
       </div>
     </Link>
   );
@@ -58,6 +61,7 @@ function MatchRow({ match }: { match: LiveMatch }) {
 export function LiveScoresWidget() {
   const dispatch = useAppDispatch();
   const t = useTranslations('sidebar');
+  const tStates = useTranslations('states');
   const { matches, status, error } = useAppSelector((s) => s.matches);
 
   useEffect(() => {
@@ -66,21 +70,20 @@ export function LiveScoresWidget() {
     }
   }, [dispatch, status]);
 
-  const laliga = matches.filter(
+  const worldCupMatches = matches.filter(
     (m) =>
-      m.competition.toLowerCase().includes('primera') ||
-      m.competition.toLowerCase().includes('la liga'),
+      m.competition.toLowerCase().includes('world cup') ||
+      m.competition.toLowerCase().includes('copa del mundo'),
   );
-  const ucl = matches.filter((m) => m.competition.toLowerCase().includes('champions'));
-
-  const today = new Date();
-  const matchday = today.getDate();
+  const otherMatches = matches.filter((m) => !worldCupMatches.some((wc) => wc.id === m.id));
 
   return (
     <div className="rounded-lg bg-white p-4 shadow-card">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-display text-base font-extrabold text-brand-navy">{t('liveScores')}</h3>
-        <Badge variant="live" className="text-[10px]">{`MATCHDAY ${matchday}`}</Badge>
+        <Badge variant="live" className="text-[10px]">
+          FIFA 2026
+        </Badge>
       </div>
 
       {status === 'loading' && (
@@ -93,42 +96,42 @@ export function LiveScoresWidget() {
 
       {status === 'failed' && (
         <ErrorState
-          title="Sin resultados"
-          message={error ?? 'No pudimos cargar los partidos.'}
+          title={tStates('emptyTitle')}
+          message={error ?? tStates('errorMessage')}
           onRetry={() => void dispatch(fetchMatches())}
         />
       )}
 
       {status === 'succeeded' && (
         <>
-          {laliga.length > 0 && (
+          {worldCupMatches.length > 0 && (
             <div className="border-t border-brand-border pt-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                LA LIGA · {t('matchday')} {matchday}
+                FIFA WORLD CUP 2026
               </p>
               <div className="mt-1 divide-y divide-brand-border/60">
-                {laliga.slice(0, 3).map((m) => (
+                {worldCupMatches.slice(0, 4).map((m) => (
                   <MatchRow key={m.id} match={m} />
                 ))}
               </div>
             </div>
           )}
 
-          {ucl.length > 0 && (
+          {otherMatches.length > 0 && (
             <div className="mt-3 border-t border-brand-border pt-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                {t('championsLeague')}
+                {t('otherMatches')}
               </p>
               <div className="mt-1 divide-y divide-brand-border/60">
-                {ucl.slice(0, 2).map((m) => (
+                {otherMatches.slice(0, 2).map((m) => (
                   <MatchRow key={m.id} match={m} />
                 ))}
               </div>
             </div>
           )}
 
-          {laliga.length === 0 && ucl.length === 0 && matches.length > 0 && (
-            <div className="border-t border-brand-border pt-2 divide-y divide-brand-border/60">
+          {worldCupMatches.length === 0 && otherMatches.length === 0 && matches.length > 0 && (
+            <div className="divide-y divide-brand-border/60 border-t border-brand-border pt-2">
               {matches.slice(0, 5).map((m) => (
                 <MatchRow key={m.id} match={m} />
               ))}
@@ -136,7 +139,7 @@ export function LiveScoresWidget() {
           )}
 
           {matches.length === 0 && (
-            <p className="py-4 text-center text-sm text-slate-500">{t('liveScores')}: sin partidos hoy.</p>
+            <p className="py-4 text-center text-sm text-slate-500">{t('noMatchesToday')}</p>
           )}
         </>
       )}

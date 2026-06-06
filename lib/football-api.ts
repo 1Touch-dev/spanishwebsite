@@ -160,7 +160,15 @@ async function fetchLiveMatchesFromFD(): Promise<LiveMatch[] | null> {
       utcDate: m.utcDate,
     }))
     .sort((a, b) => {
-      const order = { IN_PLAY: 0, LIVE: 0, PAUSED: 1, FINISHED: 2, FT: 2, HT: 0, SCHEDULED: 3 } as Record<string, number>;
+      const order = {
+        IN_PLAY: 0,
+        LIVE: 0,
+        PAUSED: 1,
+        FINISHED: 2,
+        FT: 2,
+        HT: 0,
+        SCHEDULED: 3,
+      } as Record<string, number>;
       return (order[a.status] ?? 4) - (order[b.status] ?? 4);
     });
 }
@@ -235,53 +243,53 @@ export const getLiveMatches = cache(
 // ---------- Fallback Data (used when no API token / CMS) ----------
 
 const FALLBACK_STANDINGS: StandingRow[] = [
-  { position: 1, team: 'Real Madrid CF', teamShort: 'Real Madrid', played: 34, won: 26, draw: 6, lost: 2, goalDifference: 46, points: 84 },
-  { position: 2, team: 'FC Barcelona', teamShort: 'Barcelona', played: 34, won: 24, draw: 6, lost: 4, goalDifference: 38, points: 78 },
-  { position: 3, team: 'Atlético de Madrid', teamShort: 'Atlético', played: 34, won: 21, draw: 7, lost: 6, goalDifference: 29, points: 70 },
-  { position: 4, team: 'Athletic Club', teamShort: 'Athletic', played: 34, won: 19, draw: 9, lost: 6, goalDifference: 12, points: 66 },
-  { position: 5, team: 'Villarreal CF', teamShort: 'Villarreal', played: 34, won: 17, draw: 9, lost: 8, goalDifference: 8, points: 60 },
-  { position: 6, team: 'Real Sociedad', teamShort: 'R. Sociedad', played: 34, won: 16, draw: 8, lost: 10, goalDifference: 4, points: 56 },
-  { position: 7, team: 'Real Betis', teamShort: 'Betis', played: 34, won: 14, draw: 11, lost: 9, goalDifference: 2, points: 53 },
-  { position: 8, team: 'Valencia CF', teamShort: 'Valencia', played: 34, won: 14, draw: 8, lost: 12, goalDifference: -1, points: 50 },
+  { position: 1, group: 'Group A', team: 'Mexico', teamShort: 'Mexico', played: 3, won: 2, draw: 1, lost: 0, goalDifference: 4, points: 7 },
+  { position: 2, group: 'Group A', team: 'Switzerland', teamShort: 'Switzerland', played: 3, won: 1, draw: 2, lost: 0, goalDifference: 2, points: 5 },
+  { position: 1, group: 'Group B', team: 'Spain', teamShort: 'Spain', played: 3, won: 2, draw: 1, lost: 0, goalDifference: 5, points: 7 },
+  { position: 2, group: 'Group B', team: 'Japan', teamShort: 'Japan', played: 3, won: 2, draw: 0, lost: 1, goalDifference: 1, points: 6 },
+  { position: 1, group: 'Group C', team: 'Argentina', teamShort: 'Argentina', played: 3, won: 3, draw: 0, lost: 0, goalDifference: 6, points: 9 },
+  { position: 2, group: 'Group C', team: 'Poland', teamShort: 'Poland', played: 3, won: 1, draw: 1, lost: 1, goalDifference: 0, points: 4 },
+  { position: 1, group: 'Group D', team: 'France', teamShort: 'France', played: 3, won: 2, draw: 0, lost: 1, goalDifference: 3, points: 6 },
+  { position: 2, group: 'Group D', team: 'Denmark', teamShort: 'Denmark', played: 3, won: 1, draw: 1, lost: 1, goalDifference: 1, points: 4 },
 ];
 
 const FALLBACK_MATCHES: LiveMatch[] = [
   {
     id: 1,
-    competition: 'La Liga',
-    homeTeam: 'Real Madrid',
-    awayTeam: 'Barcelona',
-    homeScore: 3,
+    competition: 'FIFA World Cup 2026',
+    homeTeam: 'Mexico',
+    awayTeam: 'Switzerland',
+    homeScore: 2,
     awayScore: 1,
     status: 'FINISHED',
     utcDate: new Date().toISOString(),
   },
   {
     id: 2,
-    competition: 'La Liga',
-    homeTeam: 'Atlético',
-    awayTeam: 'Sevilla',
-    homeScore: 2,
-    awayScore: 2,
-    status: 'FT',
+    competition: 'FIFA World Cup 2026',
+    homeTeam: 'Spain',
+    awayTeam: 'Japan',
+    homeScore: 1,
+    awayScore: 1,
+    status: 'HT',
     utcDate: new Date().toISOString(),
   },
   {
     id: 3,
-    competition: 'Champions League',
-    homeTeam: 'Barcelona',
-    awayTeam: 'Bayern',
-    homeScore: 4,
-    awayScore: 0,
-    status: 'FINISHED',
+    competition: 'FIFA World Cup 2026',
+    homeTeam: 'Argentina',
+    awayTeam: 'Poland',
+    homeScore: null,
+    awayScore: null,
+    status: 'SCHEDULED',
     utcDate: new Date().toISOString(),
   },
 ];
 
 const FALLBACK_SCORERS: TopScorer[] = [
-  { name: 'K. Mbappé', team: 'Real Madrid', goals: 27 },
-  { name: 'R. Lewandowski', team: 'Barcelona', goals: 23 },
-  { name: 'A. Griezmann', team: 'Atlético', goals: 19 },
-  { name: 'V. Williams', team: 'Athletic', goals: 16 },
-  { name: 'A. Morata', team: 'Atlético', goals: 14 },
+  { name: 'K. Mbappe', team: 'France', goals: 4 },
+  { name: 'L. Messi', team: 'Argentina', goals: 4 },
+  { name: 'A. Morata', team: 'Spain', goals: 3 },
+  { name: 'S. Gimenez', team: 'Mexico', goals: 3 },
+  { name: 'K. Havertz', team: 'Germany', goals: 2 },
 ];

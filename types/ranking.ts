@@ -1,5 +1,6 @@
 export interface StandingRow {
   position: number;
+  group?: string;
   team: string;
   teamShort: string;
   teamId?: number;

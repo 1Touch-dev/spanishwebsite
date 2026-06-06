@@ -21,7 +21,7 @@ interface NewsListingClientProps {
 
 export function NewsListingClient({
   articles,
-  initialFilter = 'all',
+  initialFilter = 'worldCup',
   title,
   description,
   showTabs = true,
@@ -30,10 +30,7 @@ export function NewsListingClient({
   const tStates = useTranslations('states');
   const [filter, setFilter] = useState<NewsTab>(initialFilter);
 
-  const filtered = useMemo(
-    () => filterArticlesByTab(articles, filter),
-    [articles, filter],
-  );
+  const filtered = useMemo(() => filterArticlesByTab(articles, filter), [articles, filter]);
 
   const displayArticles = useMemo(
     () => filtered.map(mapGolazoProArticleToNewsItem),
@@ -42,13 +39,13 @@ export function NewsListingClient({
 
   const tabItems: TabItem[] = useMemo(
     () => [
-      { id: 'all', label: t('all'), count: articles.length },
-      { id: 'laliga', label: t('laliga') },
-      { id: 'champions', label: t('champions') },
       { id: 'worldCup', label: t('worldCup') },
-      { id: 'transfers', label: t('transfers') },
+      { id: 'all', label: t('all'), count: articles.length },
       { id: 'national', label: t('national') },
+      { id: 'transfers', label: t('transfers') },
       { id: 'analysis', label: t('analysis') },
+      { id: 'champions', label: t('champions') },
+      { id: 'laliga', label: t('laliga') },
     ],
     [articles.length, t],
   );

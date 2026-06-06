@@ -1,15 +1,15 @@
 {
   "site": {
-    "name": "FútHoy",
-    "tagline": "Football news across the Spanish-speaking world",
-    "description": "News and analysis from Mexico, Colombia, Argentina, Spain, Peru and the FIFA World Cup."
+    "name": "FutHoy",
+    "tagline": "Daily coverage of FIFA World Cup 2026 and global football",
+    "description": "News, groups, matches and top scorers from FIFA World Cup 2026."
   },
   "nav": {
     "news": "News",
     "matches": "Matches",
-    "standings": "Standings",
-    "players": "Players",
-    "worldCup": "World Cup",
+    "standings": "Groups",
+    "players": "Scorers",
+    "worldCup": "World Cup 2026",
     "search": "Search"
   },
   "ticker": {
@@ -25,14 +25,16 @@
     "trending": "Trending"
   },
   "sidebar": {
-    "liveScores": "Live Scores",
-    "standings": "La Liga Standings",
-    "topScorers": "Top Scorers",
+    "liveScores": "Live matches",
+    "standings": "World Cup 2026 Groups",
+    "topScorers": "World Cup 2026 Top Scorers",
     "seeAllMatches": "See all matches",
+    "otherMatches": "Other matches",
+    "noMatchesToday": "No matches scheduled today.",
     "matchday": "MATCHDAY",
     "championsLeague": "CHAMPIONS LEAGUE",
-    "champion": "Champions",
-    "europa": "Europa"
+    "champion": "Qualified",
+    "europa": "Playoff"
   },
   "table": {
     "position": "#",
@@ -52,11 +54,11 @@
   },
   "filters": {
     "all": "All",
-    "laliga": "La Liga",
+    "laliga": "Club football",
     "champions": "Champions",
-    "worldCup": "World Cup",
+    "worldCup": "World Cup 2026",
     "transfers": "Transfers",
-    "national": "National Teams",
+    "national": "National teams",
     "analysis": "Analysis"
   },
   "country": {
@@ -66,18 +68,18 @@
     "topPlayers": "Featured players"
   },
   "states": {
-    "loading": "Loading news…",
+    "loading": "Loading news...",
     "emptyTitle": "No results",
     "emptyMessage": "No news yet for this section.",
-    "errorTitle": "Couldn't load news",
+    "errorTitle": "Could not load news",
     "errorMessage": "Something failed. Please try again in a moment.",
     "retry": "Retry"
   },
   "search": {
     "title": "Search",
-    "subtitle": "Find news across FútHoy and aggregated sources.",
-    "placeholder": "Search teams, players, leagues…",
-    "placeholderShort": "Search…",
+    "subtitle": "Find World Cup 2026 stories and other football coverage.",
+    "placeholder": "Search teams, players, groups...",
+    "placeholderShort": "Search...",
     "useHeaderSearch": "Use the search bar in the header to find news.",
     "resultsFor": "Results for \"{query}\"",
     "hint": "Type a team, player, or topic to search all news.",
@@ -109,7 +111,7 @@
     "playerTitle": "Player #{id}",
     "playerDescription": "Player profile and statistics.",
     "teamTitle": "Team #{id}",
-    "teamDescription": "Squad, results and league standing.",
+    "teamDescription": "Squad, results and standings.",
     "tabEvents": "Events",
     "tabLineups": "Lineups",
     "tabStats": "Statistics",
@@ -137,17 +139,17 @@
     "posFWD": "Forwards",
     "posOther": "Other",
     "noEventsUpcomingTitle": "Match not started",
-    "noEventsUpcoming": "Goals, cards and substitutions will appear here once kick-off.",
+    "noEventsUpcoming": "Goals, cards and substitutions will appear here once kick-off begins.",
     "noEventsFinishedTitle": "No events recorded",
     "noEventsFinished": "No events are available for this match from the API.",
     "noStatsUpcomingTitle": "Stats after kick-off",
     "noStatsUpcoming": "Possession, shots and more will show during and after the match.",
     "noStatsFinishedTitle": "Statistics unavailable",
-    "noStatsFinished": "No statistics for this match. Try another finished (FT) fixture.",
-    "noLineupsUpcomingTitle": "Line-ups coming soon",
-    "noLineupsUpcoming": "Official line-ups are usually published closer to kick-off.",
-    "noLineupsFinishedTitle": "Line-ups unavailable",
-    "noLineupsFinished": "No line-ups for this match.",
+    "noStatsFinished": "No statistics for this match. Try another finished fixture.",
+    "noLineupsUpcomingTitle": "Lineups coming soon",
+    "noLineupsUpcoming": "Official lineups are usually published closer to kick-off.",
+    "noLineupsFinishedTitle": "Lineups unavailable",
+    "noLineupsFinished": "No lineups for this match.",
     "tryFinishedMatch": "Tip: open a finished match (FT) to see full events and statistics."
   }
 }

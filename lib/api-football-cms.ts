@@ -106,9 +106,12 @@ export interface ApiFootballFixture {
 
 interface ApiFootballStandingRow {
   rank: number;
+  group?: string;
   team: ApiFootballTeam;
   points: number;
   goalsDiff: number;
+  form?: string;
+  description?: string;
   all: {
     played: number;
     win: number;
@@ -183,22 +186,29 @@ export function mapFixtureToLiveMatch(fx: ApiFootballFixture): LiveMatch {
 
 export function mapStandingsToRows(payload: unknown): StandingRow[] {
   const leagues = extractResponse<ApiFootballStandingsLeague>(payload);
-  const table = leagues[0]?.league?.standings?.[0];
-  if (!Array.isArray(table)) return [];
+  const groups = leagues[0]?.league?.standings;
+  if (!Array.isArray(groups)) return [];
 
-  return table.map((row) => ({
-    position: row.rank,
-    team: row.team.name,
-    teamShort: row.team.name,
-    teamId: row.team.id,
-    crest: row.team.logo,
-    played: row.all.played,
-    won: row.all.win,
-    draw: row.all.draw,
-    lost: row.all.lose,
-    goalDifference: row.goalsDiff,
-    points: row.points,
-  }));
+  return groups.flatMap((table, index) => {
+    if (!Array.isArray(table)) return [];
+
+    return table.map((row) => ({
+      position: row.rank,
+      group: row.group || `Group ${String.fromCharCode(65 + index)}`,
+      team: row.team.name,
+      teamShort: row.team.name,
+      teamId: row.team.id,
+      crest: row.team.logo,
+      played: row.all.played,
+      won: row.all.win,
+      draw: row.all.draw,
+      lost: row.all.lose,
+      goalDifference: row.goalsDiff,
+      points: row.points,
+      form: row.form,
+      description: row.description,
+    }));
+  });
 }
 
 export function mapTopScorersToRows(payload: unknown, limit = 10): TopScorer[] {
@@ -223,7 +233,7 @@ function getDefaultSeason(): number {
     const parsed = Number.parseInt(raw, 10);
     if (Number.isFinite(parsed)) return parsed;
   }
-  return 2025;
+  return 2026;
 }
 
 // ---------- Detail page fetchers ----------

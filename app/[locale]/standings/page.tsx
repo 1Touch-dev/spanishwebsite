@@ -4,7 +4,7 @@ import { StandingsClient } from '@/components/matches/StandingsClient';
 export const revalidate = 600;
 
 export async function generateMetadata() {
-  return { title: 'Clasificación La Liga' };
+  return { title: 'FIFA World Cup 2026 Standings' };
 }
 
 export default async function StandingsPage({

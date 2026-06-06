@@ -19,7 +19,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'nav' });
   return {
     title: t('worldCup'),
-    description: 'Cobertura completa de la Copa del Mundo de la FIFA',
+    description: 'Coverage of FIFA World Cup 2026 news, fixtures, standings and stars.',
   };
 }
 
@@ -41,7 +41,7 @@ export default async function WorldCupPage({
     });
     articles = response.data;
   } catch (error) {
-    loadError = error instanceof Error ? error.message : 'No pudimos cargar las noticias.';
+    loadError = error instanceof Error ? error.message : 'Could not load news.';
   }
 
   return (
@@ -55,17 +55,14 @@ export default async function WorldCupPage({
             {tNav('worldCup')}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-brand-navy/80">
-            Toda la actualidad del torneo mas importante del futbol mundial.
+            Daily coverage of FIFA World Cup 2026 with matchday updates, group drama and breakout stars.
           </p>
         </div>
       </header>
 
       {loadError ? (
         <section className="container-fh py-6">
-          <ErrorState
-            title="No pudimos cargar las noticias"
-            message={loadError}
-          />
+          <ErrorState title="Could not load the news" message={loadError} />
         </section>
       ) : (
         <NewsListingClient articles={articles} showTabs={false} />

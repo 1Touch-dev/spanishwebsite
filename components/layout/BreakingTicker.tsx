@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Zap } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import type { NewsItem } from '@/lib/types';
 
 interface BreakingTickerProps {
@@ -24,18 +25,29 @@ export function BreakingTicker({ items }: BreakingTickerProps) {
         </div>
         <div className="relative flex-1 overflow-hidden">
           <div className="ticker-track py-1.5 text-sm font-medium">
-            {tickerItems.map((item, idx) => (
-              <a
-                key={`${item.id}-${idx}`}
-                href={item.url}
-                target={item.isInternal ? undefined : '_blank'}
-                rel={item.isInternal ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center gap-2 hover:underline"
-              >
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red" />
-                <span>{item.title}</span>
-              </a>
-            ))}
+            {tickerItems.map((item, idx) =>
+              item.isInternal ? (
+                <Link
+                  key={`${item.id}-${idx}`}
+                  href={item.url}
+                  className="inline-flex items-center gap-2 hover:underline"
+                >
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red" />
+                  <span>{item.title}</span>
+                </Link>
+              ) : (
+                <a
+                  key={`${item.id}-${idx}`}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 hover:underline"
+                >
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red" />
+                  <span>{item.title}</span>
+                </a>
+              ),
+            )}
           </div>
         </div>
       </div>

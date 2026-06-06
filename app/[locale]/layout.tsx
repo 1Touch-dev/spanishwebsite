@@ -8,8 +8,12 @@ import { Header } from '@/components/layout/Header';
 import { BreakingTicker } from '@/components/layout/BreakingTicker';
 import { NewsletterCTA } from '@/components/layout/NewsletterCTA';
 import { Footer } from '@/components/layout/Footer';
-import { getBreakingNews } from '@/lib/rss';
+import { getArticlesAsNewsItems } from '@/lib/mdx';
 import { StoreProvider } from '@/store/StoreProvider';
+import {
+  fetchWorldCupArticles,
+  mapGolazoProArticleToNewsItem,
+} from '@/src/lib/cms/golazoProApi';
 import '../globals.css';
 
 const inter = Inter({
@@ -40,8 +44,8 @@ export async function generateMetadata({
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
     title: {
-      default: `${t('name')} — ${t('tagline')}`,
-      template: `%s · ${t('name')}`,
+      default: `${t('name')} - ${t('tagline')}`,
+      template: `%s | ${t('name')}`,
     },
     description: t('description'),
     openGraph: {
@@ -71,17 +75,22 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
-  let breakingNews: Awaited<ReturnType<typeof getBreakingNews>> = [];
+  let breakingNews = [];
+
   try {
-    breakingNews = await getBreakingNews();
+    const response = await fetchWorldCupArticles(1, 6, {
+      next: { revalidate: 60 },
+    });
+    breakingNews = response.data.map(mapGolazoProArticleToNewsItem);
   } catch (err) {
-    console.error('[layout] breaking news failed:', (err as Error).message);
+    console.error('[layout] world cup ticker failed:', (err as Error).message);
+    breakingNews = (await getArticlesAsNewsItems()).slice(0, 6);
   }
 
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsMediaOrganization',
-    name: 'FútHoy',
+    name: 'FutHoy',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://futhoy.com',
     inLanguage: locale === 'es' ? 'es-ES' : 'en-US',
     sameAs: [],
@@ -89,7 +98,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-brand-surface text-brand-navy">
+      <body className="flex min-h-screen flex-col bg-brand-surface text-brand-navy">
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger

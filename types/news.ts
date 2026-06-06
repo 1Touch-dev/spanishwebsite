@@ -3,13 +3,14 @@ export type NewsTag =
   | 'Champions'
   | 'Mundial'
   | 'World Cup'
+  | 'World Cup 2026'
   | 'Fichajes'
-  | 'Selección'
-  | 'Análisis'
-  | 'Copa América'
+  | 'Seleccion'
+  | 'Analisis'
+  | 'Copa America'
   | 'Real Madrid'
-  | 'Barça'
-  | 'Atlético';
+  | 'Barca'
+  | 'Atletico';
 
 export interface NewsItem {
   id: string;

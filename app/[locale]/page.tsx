@@ -11,7 +11,7 @@ import { LiveScoresWidget } from '@/components/sidebar/LiveScoresWidget';
 import { HomeSidebarData } from '@/components/sidebar/HomeSidebarData';
 import type { NewsItem } from '@/types';
 import {
-  fetchHomeArticles,
+  fetchWorldCupArticles,
   mapGolazoProArticleToNewsItem,
 } from '@/src/lib/cms/golazoProApi';
 
@@ -19,22 +19,28 @@ export const revalidate = 60;
 
 const HIGHLIGHTS = [
   {
-    title: 'Gol olímpico de Mbappé',
-    subtitle: 'Real Madrid 3-1 Barça',
-    duration: '2:34',
-    thumbnail: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80&auto=format&fit=crop',
+    title: 'Road to the Final',
+    subtitle: 'FIFA World Cup 2026',
+    duration: '3:08',
+    thumbnail:
+      'https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=600&q=80&auto=format&fit=crop',
+    href: '/world-cup',
   },
   {
-    title: 'Barça aplasta al Bayern',
-    subtitle: 'Champions League',
-    duration: '4:12',
-    thumbnail: 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=600&q=80&auto=format&fit=crop',
+    title: 'Group Stage Storylines',
+    subtitle: 'Mexico, USA and Canada',
+    duration: '4:21',
+    thumbnail:
+      'https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=600&q=80&auto=format&fit=crop',
+    href: '/standings',
   },
   {
-    title: 'Resumen Jornada 34',
-    subtitle: 'La Liga',
-    duration: '1:58',
-    thumbnail: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600&q=80&auto=format&fit=crop',
+    title: 'Stars to Watch',
+    subtitle: 'World Cup 2026',
+    duration: '2:41',
+    thumbnail:
+      'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600&q=80&auto=format&fit=crop',
+    href: '/players',
   },
 ];
 
@@ -47,12 +53,12 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   let articles: NewsItem[] = [];
 
   try {
-    const response = await fetchHomeArticles(9, {
+    const response = await fetchWorldCupArticles(1, 9, {
       next: { revalidate: 60 },
     });
     articles = response.data.map(mapGolazoProArticleToNewsItem);
   } catch (error) {
-    loadError = error instanceof Error ? error.message : 'No pudimos cargar las noticias.';
+    loadError = error instanceof Error ? error.message : 'Could not load news.';
   }
 
   const hero = articles[0];
@@ -64,14 +70,11 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <section className="space-y-6 lg:col-span-2">
           {loadError ? (
-            <ErrorState
-              title="No pudimos cargar las noticias"
-              message={loadError}
-            />
+            <ErrorState title="Could not load the news" message={loadError} />
           ) : articles.length === 0 ? (
             <EmptyState
-              title="Sin noticias destacadas"
-              message="Todavía no hay artículos asignados al endpoint HomePage."
+              title="No featured stories"
+              message="There are no World Cup 2026 stories available yet."
             />
           ) : (
             <>
@@ -115,7 +118,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 {t('highlightsOfDay')}
               </h2>
               <Link
-                href="/news"
+                href="/world-cup"
                 className="inline-flex items-center gap-1 text-sm font-bold text-brand-red hover:underline"
               >
                 {t('seeMore')}

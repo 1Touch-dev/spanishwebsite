@@ -3,8 +3,9 @@ import type { Country } from '@/types';
 
 const countries = countriesData as Country[];
 
-const DEFAULT_COUNTRY_ID = 'spain';
-const DEFAULT_LEAGUE_ID = 140;
+const DEFAULT_COUNTRY_ID = 'worldcup';
+const DEFAULT_LEAGUE_ID = 1;
+const DEFAULT_SEASON = 2026;
 
 function getDefaultSeason(): number {
   const raw = process.env.FOOTBALL_API_SEASON;
@@ -12,7 +13,7 @@ function getDefaultSeason(): number {
     const parsed = Number.parseInt(raw, 10);
     if (Number.isFinite(parsed)) return parsed;
   }
-  return 2025;
+  return DEFAULT_SEASON;
 }
 
 export interface CountryLeagueConfig {
@@ -23,6 +24,14 @@ export interface CountryLeagueConfig {
 
 export function resolveCountryLeague(countryId?: string): CountryLeagueConfig {
   const defaultSeason = getDefaultSeason();
+
+  if (countryId === DEFAULT_COUNTRY_ID) {
+    return {
+      countryId: DEFAULT_COUNTRY_ID,
+      leagueId: DEFAULT_LEAGUE_ID,
+      season: defaultSeason,
+    };
+  }
 
   if (countryId) {
     const match = countries.find((c) => c.id === countryId);
@@ -35,11 +44,10 @@ export function resolveCountryLeague(countryId?: string): CountryLeagueConfig {
     }
   }
 
-  const fallback = countries.find((c) => c.id === DEFAULT_COUNTRY_ID);
   return {
     countryId: DEFAULT_COUNTRY_ID,
-    leagueId: fallback?.leagueId ?? DEFAULT_LEAGUE_ID,
-    season: fallback?.season ?? defaultSeason,
+    leagueId: DEFAULT_LEAGUE_ID,
+    season: defaultSeason,
   };
 }
 

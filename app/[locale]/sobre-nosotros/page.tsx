@@ -13,12 +13,12 @@ export default async function SobreNosotrosPage({
   setRequestLocale(locale);
 
   return (
-    <div className="container-fh py-10 max-w-3xl">
+    <div className="container-fh max-w-3xl py-10">
       <h1 className="font-display text-3xl font-extrabold text-brand-navy">Sobre nosotros</h1>
-      <p className="mt-4 text-slate-600 leading-relaxed">
-        FútHoy es tu portal de noticias de fútbol español: La Liga, Champions League, fichajes,
-        resultados en vivo y análisis. Combinamos cobertura propia con enlaces a las mejores fuentes
-        del deporte en español.
+      <p className="mt-4 leading-relaxed text-slate-600">
+        FutHoy sigue la actualidad de FIFA World Cup 2026 con noticias, grupos, partidos en vivo,
+        goleadores y analisis. Combinamos cobertura propia con enlaces a fuentes destacadas del
+        futbol internacional en espanol.
       </p>
     </div>
   );

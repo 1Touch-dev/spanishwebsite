@@ -1,38 +1,40 @@
 {
   "site": {
-    "name": "FútHoy",
-    "tagline": "Toda la actualidad del fútbol del mundo hispano",
-    "description": "Noticias y análisis del fútbol de México, Colombia, Argentina, España, Perú y la Copa del Mundo."
+    "name": "FutHoy",
+    "tagline": "Cobertura diaria de FIFA World Cup 2026 y el futbol internacional",
+    "description": "Noticias, grupos, partidos y goleadores de FIFA World Cup 2026."
   },
   "nav": {
     "news": "Noticias",
     "matches": "Partidos",
-    "standings": "Clasificación",
-    "players": "Jugadores",
-    "worldCup": "Copa del Mundo",
+    "standings": "Grupos",
+    "players": "Goleadores",
+    "worldCup": "Mundial 2026",
     "search": "Buscar"
   },
   "ticker": {
-    "label": "ÚLTIMA HORA"
+    "label": "ULTIMA HORA"
   },
   "home": {
     "exclusive": "EXCLUSIVA",
-    "latestNews": "ÚLTIMAS NOTICIAS",
-    "highlightsOfDay": "HIGHLIGHTS DEL DÍA",
+    "latestNews": "ULTIMAS NOTICIAS",
+    "highlightsOfDay": "HIGHLIGHTS DEL DIA",
     "seeAll": "Ver todo",
-    "seeMore": "Ver más",
-    "heroLead": "Lo más destacado",
+    "seeMore": "Ver mas",
+    "heroLead": "Lo mas destacado",
     "trending": "Tendencias"
   },
   "sidebar": {
-    "liveScores": "Resultados en vivo",
-    "standings": "Clasificación La Liga",
-    "topScorers": "Máximos Goleadores",
+    "liveScores": "Partidos en vivo",
+    "standings": "Grupos Mundial 2026",
+    "topScorers": "Goleadores Mundial 2026",
     "seeAllMatches": "Ver todos los partidos",
+    "otherMatches": "Otros partidos",
+    "noMatchesToday": "No hay partidos programados hoy.",
     "matchday": "JORNADA",
     "championsLeague": "CHAMPIONS LEAGUE",
-    "champion": "Champions",
-    "europa": "Europa"
+    "champion": "Clasificados",
+    "europa": "Repechaje"
   },
   "table": {
     "position": "#",
@@ -52,12 +54,12 @@
   },
   "filters": {
     "all": "Todas",
-    "laliga": "La Liga",
+    "laliga": "Clubes",
     "champions": "Champions",
-    "worldCup": "Copa del Mundo",
+    "worldCup": "Mundial 2026",
     "transfers": "Fichajes",
     "national": "Selecciones",
-    "analysis": "Análisis"
+    "analysis": "Analisis"
   },
   "country": {
     "newsTitle": "Noticias de {country}",
@@ -66,29 +68,29 @@
     "topPlayers": "Jugadores destacados"
   },
   "states": {
-    "loading": "Cargando noticias…",
+    "loading": "Cargando noticias...",
     "emptyTitle": "Sin resultados",
-    "emptyMessage": "Aún no hay noticias para esta sección.",
+    "emptyMessage": "Aun no hay noticias para esta seccion.",
     "errorTitle": "No pudimos cargar las noticias",
-    "errorMessage": "Algo falló en la conexión. Inténtalo de nuevo en unos segundos.",
+    "errorMessage": "Algo fallo en la conexion. Intentalo de nuevo en unos segundos.",
     "retry": "Reintentar"
   },
   "search": {
     "title": "Buscar",
-    "subtitle": "Encuentra noticias en FútHoy y fuentes agregadas.",
-    "placeholder": "Buscar equipos, jugadores, ligas…",
-    "placeholderShort": "Buscar…",
-    "useHeaderSearch": "Usa la barra de búsqueda del encabezado para buscar noticias.",
-    "resultsFor": "Resultados para «{query}»",
+    "subtitle": "Encuentra noticias del Mundial 2026 y otras coberturas.",
+    "placeholder": "Buscar equipos, jugadores, grupos...",
+    "placeholderShort": "Buscar...",
+    "useHeaderSearch": "Usa la barra de busqueda del encabezado para buscar noticias.",
+    "resultsFor": "Resultados para \"{query}\"",
     "hint": "Escribe un equipo, jugador o tema para buscar en todas las noticias.",
     "noResultsTitle": "Sin coincidencias",
-    "noResultsMessage": "No hay noticias para \"{query}\". Prueba con otro término.",
+    "noResultsMessage": "No hay noticias para \"{query}\". Prueba con otro termino.",
     "resultsCount": "{count, plural, one {# resultado} other {# resultados}}"
   },
   "footer": {
     "about": "Sobre nosotros",
     "contact": "Contacto",
-    "privacy": "Política de privacidad",
+    "privacy": "Politica de privacidad",
     "rss": "RSS",
     "ads": "Publicidad",
     "rights": "Todos los derechos reservados"
@@ -100,28 +102,28 @@
     "vs": "vs",
     "goals": "goles",
     "loading": "Cargando...",
-    "error": "Algo salió mal",
+    "error": "Algo salio mal",
     "noData": "Sin datos disponibles"
   },
   "detail": {
     "matchTitle": "Partido #{id}",
-    "matchDescription": "Estadísticas, alineaciones y eventos del partido.",
+    "matchDescription": "Estadisticas, alineaciones y eventos del partido.",
     "playerTitle": "Jugador #{id}",
-    "playerDescription": "Perfil y estadísticas del jugador.",
+    "playerDescription": "Perfil y estadisticas del jugador.",
     "teamTitle": "Equipo #{id}",
-    "teamDescription": "Plantilla, resultados y clasificación del equipo.",
+    "teamDescription": "Plantilla, resultados y clasificacion del equipo.",
     "tabEvents": "Eventos",
     "tabLineups": "Alineaciones",
-    "tabStats": "Estadísticas",
+    "tabStats": "Estadisticas",
     "tabH2H": "H2H",
     "tabSquad": "Plantilla",
-    "tabUpcoming": "Próximos",
+    "tabUpcoming": "Proximos",
     "tabResults": "Resultados",
-    "matchNotFound": "No se encontró el partido.",
+    "matchNotFound": "No se encontro el partido.",
     "playerNotFound": "Jugador no encontrado.",
     "teamNotFound": "Equipo no encontrado.",
-    "seasonStats": "Estadísticas de temporada",
-    "recentMatches": "Últimos partidos",
+    "seasonStats": "Estadisticas de temporada",
+    "recentMatches": "Ultimos partidos",
     "squadEmpty": "Plantilla no disponible.",
     "statGoals": "Goles",
     "statAssists": "Asistencias",
@@ -137,17 +139,17 @@
     "posFWD": "Delanteros",
     "posOther": "Otros",
     "noEventsUpcomingTitle": "Partido sin comenzar",
-    "noEventsUpcoming": "Los goles, tarjetas y cambios aparecerán aquí cuando empiece el partido.",
+    "noEventsUpcoming": "Los goles, tarjetas y cambios apareceran aqui cuando empiece el partido.",
     "noEventsFinishedTitle": "Sin eventos registrados",
     "noEventsFinished": "No hay eventos disponibles para este partido en la API.",
-    "noStatsUpcomingTitle": "Estadísticas tras el pitido inicial",
-    "noStatsUpcoming": "Posesión, disparos y más datos se mostrarán durante y después del partido.",
-    "noStatsFinishedTitle": "Estadísticas no disponibles",
-    "noStatsFinished": "No hay estadísticas para este partido. Prueba otro encuentro finalizado.",
-    "noLineupsUpcomingTitle": "Alineaciones próximamente",
+    "noStatsUpcomingTitle": "Estadisticas tras el pitido inicial",
+    "noStatsUpcoming": "Posesion, disparos y mas datos se mostraran durante y despues del partido.",
+    "noStatsFinishedTitle": "Estadisticas no disponibles",
+    "noStatsFinished": "No hay estadisticas para este partido. Prueba otro encuentro finalizado.",
+    "noLineupsUpcomingTitle": "Alineaciones proximamente",
     "noLineupsUpcoming": "Las alineaciones oficiales suelen publicarse cerca del inicio del partido.",
     "noLineupsFinishedTitle": "Alineaciones no disponibles",
     "noLineupsFinished": "No hay alineaciones para este partido.",
-    "tryFinishedMatch": "Consejo: abre un partido finalizado (FT) para ver eventos y estadísticas completas."
+    "tryFinishedMatch": "Consejo: abre un partido finalizado (FT) para ver eventos y estadisticas completas."
   }
 }

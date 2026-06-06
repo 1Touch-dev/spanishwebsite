@@ -25,17 +25,17 @@ export function NewsletterCTA() {
           </div>
           <div className="flex-1">
             <h3 className="font-display text-2xl font-extrabold">
-              No te pierdas ninguna noticia
+              Do not miss a World Cup story
             </h3>
             <p className="mt-1 text-sm text-white/70">
-              Recibe el resumen diario de La Liga, Champions y fichajes en tu correo.
+              Get FIFA World Cup 2026 headlines, match recaps and standout player updates in your inbox.
             </p>
           </div>
           <form onSubmit={onSubmit} className="flex w-full max-w-md gap-2 md:w-auto">
             {submitted ? (
               <div className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold">
                 <Check className="h-4 w-4" />
-                ¡Gracias! Te has suscrito.
+                Thanks, you are subscribed.
               </div>
             ) : (
               <>
@@ -44,7 +44,7 @@ export function NewsletterCTA() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder="you@email.com"
                   suppressHydrationWarning
                   autoComplete="email"
                   className="flex-1 rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/50 focus:border-brand-yellow focus:outline-none focus:ring-1 focus:ring-brand-yellow"
@@ -53,7 +53,7 @@ export function NewsletterCTA() {
                   type="submit"
                   className="rounded-full bg-brand-red px-5 py-2.5 text-sm font-bold hover:bg-brand-red-dark"
                 >
-                  Suscribirme
+                  Subscribe
                 </HydrationSafeButton>
               </>
             )}

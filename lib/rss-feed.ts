@@ -46,24 +46,22 @@ export async function buildSiteRssFeed(): Promise<string> {
   const siteUrl = getSiteUrl();
   const articles = await getAllArticles();
   const latest = articles.slice(0, 50);
-  const lastBuild = latest[0]?.date
-    ? toRfc822(latest[0].date)
-    : new Date().toUTCString();
+  const lastBuild = latest[0]?.date ? toRfc822(latest[0].date) : new Date().toUTCString();
 
   const items = latest.map((a) => articleItemXml(a, siteUrl)).join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>FútHoy — Fútbol español</title>
+    <title>FutHoy - FIFA World Cup 2026</title>
     <link>${siteUrl}</link>
-    <description>Las últimas noticias y análisis de La Liga, Champions y la selección española.</description>
+    <description>Latest FIFA World Cup 2026 news, standings, match recaps and player analysis.</description>
     <language>es-ES</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>
     <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml" />
     <image>
       <url>${siteUrl}/icon.svg</url>
-      <title>FútHoy</title>
+      <title>FutHoy</title>
       <link>${siteUrl}</link>
     </image>
 ${items}

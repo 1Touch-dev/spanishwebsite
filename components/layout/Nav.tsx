@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export const NAV_LINKS = [
+  { key: 'worldCup', href: '/world-cup' },
   { key: 'news', href: '/news' },
   { key: 'matches', href: '/matches' },
   { key: 'standings', href: '/standings' },
   { key: 'players', href: '/players' },
-  { key: 'worldCup', href: '/world-cup' },
 ] as const;
 
 export type NavLinkKey = (typeof NAV_LINKS)[number]['key'];
@@ -25,7 +25,7 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden lg:block bg-brand-red">
+    <nav className="hidden bg-brand-red lg:block">
       <div className="container-fh">
         <ul className="flex items-center gap-0.5 text-sm font-semibold text-white/90">
           {NAV_LINKS.map((link) => {
